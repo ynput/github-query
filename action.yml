@@ -1,0 +1,59 @@
+---
+
+name: Github Release Information
+description: Fetch and convert data from github to use for a release trigger
+
+branding:
+  icon: plus
+  color: green
+
+inputs:
+  repo:
+    description: Repository to query data from in the format of <owner>/<repo-name>
+    required: true
+  date:
+    description: Starting date to start query from.
+    required: true
+  query_parameters:
+    description: Parameters to query for in pr Information
+    required: true
+
+outputs:
+  raw-output:
+    description: Full output json dictionary from github api.
+    value: ${{ steps.raw-output.output.rw_output }}
+  label-list:
+    description: List of unique labels found in PRs.
+    value: ${{ steps.get-labels-list.output.label_list }}
+  bump-increment:
+    description: Increment for version bumping - either `patch` or 'minor'
+    value: ${{ steps.bump-increment.output.increment }}
+  changelog-markdown:
+    description: String containing full makrdown syntax for release changelog information
+    value: # TODO changelog markdown string
+
+runs:
+  using: composite
+  
+  steps:
+    - name: Get raw GitHub output
+      id: raw-output
+      shell: bash
+      run: |
+        rw_output=$(gh pr list --state merged --search 'merged:>=${{ inputs.date }}' --json ${{ inputs.query_parameters }} --repo ${{ inputs.repo }})
+        echo "rw_output=$rw_output" >> GITHUB_OUTPUT
+
+    - name: Get label list
+      id: get-labels-list
+      shell: bash
+      run: |
+        label_list=$(python -c 'import fetch_github_data; fetch_github_data.get_labels()' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        echo "label_list=$label_list" >> GITHUB_OUTPUT
+
+    - name: Get bump increment
+      id: bump-increment
+      run: |
+        increment=$(python -c 'import fetch_github_data; print(fetch_github_data.get_version_increment())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        echo "increment=$increment" >> GITHUB_OUTPUT
+
+...
