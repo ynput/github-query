@@ -41,6 +41,7 @@ runs:
       shell: bash
       run: |
         raw_output=$(gh pr list --state merged --search 'merged:>=${{ inputs.date }}' --json ${{ inputs.query_parameters }} --repo ${{ inputs.repo }})
+        echo $raw_output
         echo "raw_output=$raw_output" >> ${GITHUB_OUTPUT}
 
     - name: Get label list
@@ -49,6 +50,7 @@ runs:
       run: |
         cd ${GITHUB_ACTION_PATH}
         label_list=$(python -c 'import fetch_github_data; fetch_github_data.get_labels()' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        echo $label_list"
         echo "label_list=$label_list" >> ${GITHUB_OUTPUT}
 
     - name: Get bump increment
@@ -57,6 +59,7 @@ runs:
       run: |
         cd ${GITHUB_ACTION_PATH}
         increment=$(python -c 'import fetch_github_data; print(fetch_github_data.get_version_increment())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        echo $increment
         echo "increment=$increment" >> ${GITHUB_OUTPUT}
 
 ...
