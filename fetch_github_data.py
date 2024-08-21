@@ -84,7 +84,7 @@ def prepare_changelog_markdown(collect_inputs, get_changelog):
     return pr_output_list
 
 def get_labels():
-    github_data = collect_inputs()
+    github_data = get_inputs(get_raw_output())
     labels = set()
 
     for item in github_data:
@@ -94,9 +94,11 @@ def get_labels():
     return json.dumps(list(labels))
 
 def get_version_increment():
-    # TODO get repo string dynamically
+    
+    repo_name, _, _ = get_inputs()
+
     minor_bump_label= subprocess.run(
-        ["gh", "variable", "get", "MINOR_BUMP_LABEL", "--repo", "ynput/ayon-addon-action-testing"],
+        ["gh", "variable", "get", "MINOR_BUMP_LABEL", "--repo", repo_name],
         capture_output=True,
         text=True,
         check=True
