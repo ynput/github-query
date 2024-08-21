@@ -94,7 +94,7 @@ def get_labels():
     return json.dumps(list(labels))
 
 def get_version_increment():
-    
+
     repo_name, _, _ = get_inputs()
 
     minor_bump_label= subprocess.run(
