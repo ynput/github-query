@@ -66,22 +66,31 @@ def changelog_per_label(json_dict):
         if any(item in changelog_labels for item in labels):
             pass
 
-def prepare_changelog_markdown(collect_inputs, get_changelog):
-    pr_output_list = []
-    pr_output = {}
+def prepare_changelog_markdown():
+    repo_name, query_tags, latest_release_date = get_inputs()
+    pr_query = get_raw_output(repo_name=repo_name, query_tags=query_tags, latest_release_date=latest_release_date)
+   
+    minor_bump_label_list = get_repo_label(repo=repo_name, label_name="MINOR_BUMP_LABEL")
+    patch_bump_label_list = get_repo_label(repo=repo_name, label_name="PATCH_BUMP_LABEL")
+    
+    # ? should version bump labels also be filter for changelog ?
+    label_list = minor_bump_label_list + patch_bump_label_list
+    changelog = ""
 
-    for pr_data in collect_inputs():
-        labels = pr_data["labels"]
-        changelog_markdown = ""
+    for pr in pr_query:
+        # get all label names in a list
+        pr_label_list = [label["name"] for label in pr["labels"]]
+        fitlered_label = list(set(label_list).intersection(pr_label_list))[0]  # any(label in label_list for label in pr_label_list)
 
-        changelog_markdown =+ f"## {labels}"
-        pr_output["title"] = pr_data["title"]
-        pr_output["label_name"] = [label["name"] for label in pr_data["labels"]]
-        pr_output["changelog"] = get_changelog(pr_data=pr_data["body"], changelog_start="## Changes")  # TODO udpate to "changelog"
+        if fitlered_label:
+            change_list = get_changelog(pr_data=pr["body"], changelog_start="## Changes")
+            
+            changelog += f"## {fitlered_label.capitalize()}\n"
+            changelog += "".join([f"* {change}\n" for change in change_list])
+            changelog += "\n"
 
-        pr_output_list.append(pr_output)
+    return changelog
 
-    return pr_output_list
 
 def get_labels():
     github_data = get_raw_output(*get_inputs())
@@ -93,25 +102,23 @@ def get_labels():
 
     return json.dumps(list(labels))
 
+def get_repo_label(repo, label_name):
+   
+    label= subprocess.run(
+        ["gh", "variable", "get", label_name, "--repo", repo],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+
+    return label.stdout.strip().split(", " or ",")
+
 def get_version_increment():
 
     repo_name, _, _ = get_inputs()
 
-    minor_bump_label= subprocess.run(
-        ["gh", "variable", "get", "MINOR_BUMP_LABEL", "--repo", repo_name],
-        capture_output=True,
-        text=True,
-        check=True
-    )
-    minor_bump_label_list = minor_bump_label.stdout.strip().split(", " or ",")
-
-    patch_bump_label= subprocess.run(
-        ["gh", "variable", "get", "PATCH_BUMP_LABEL", "--repo", "ynput/ayon-addon-action-testing"],
-        capture_output=True,
-        text=True,
-        check=True
-    )
-    patch_bump_label_list = patch_bump_label.stdout.strip().split(", " or ",")
+    minor_bump_label_list = get_repo_label(repo=repo_name, label_name="MINOR_BUMP_LABEL")
+    patch_bump_label_list = get_repo_label(repo=repo_name, label_name="PATCH_BUMP_LABEL")
 
     for label in json.loads(get_labels()):
         if label.lower() in minor_bump_label_list:
