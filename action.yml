@@ -48,7 +48,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        label_list=$(python -c 'import fetch_github_data; fetch_github_data.get_labels()' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        label_list=$(python -c 'import fetch_github_data; print(fetch_github_data.get_labels())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "label_list=$label_list" >> $GITHUB_OUTPUT
 
     - name: Get bump increment
