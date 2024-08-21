@@ -4,13 +4,13 @@ import subprocess
 
 repo_name = None
 
-def collect_inputs():
-    """Get parameters for gh command.
+def get_inputs():
+    """Get terminal parameters.
 
     Returns:
-        json dict: dictionary retunred from github api.
+        tuple(str): Parameters as string tuple.
     """
-    # TODO split between providing parameters and returning raw data
+
     parser = argparse.ArgumentParser(description="A python script to convert github pr information to a more simple format.")
     parser.add_argument("repo", type=str, help="Repository name consisting of 'repo-owner/repo-name'")
     parser.add_argument('query_parameters', type=str, help='Keys to query for.')
@@ -20,6 +20,10 @@ def collect_inputs():
     repo_name = args.repo
     query_tags = args.query_parameters.split(',')
     latest_release_date = args.date
+
+    return repo_name, query_tags, latest_release_date
+
+def get_raw_output(repo_name, query_tags, latest_release_date):
 
     command = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo_name}"
     pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
