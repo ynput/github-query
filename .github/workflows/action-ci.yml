@@ -2,7 +2,7 @@ name: Test custom action
 on:
   workflow_dispatch:
 env:
-  GH_TOKEN: ${{ secrets.CI_TOKEN}}
+  GH_TOKEN: ${{ secrets.CI_TOKEN }}
 jobs:
   test-action:
     runs-on: ubuntu-latest
@@ -15,3 +15,9 @@ jobs:
             repo: "ynput/ayon-addon-action-testing"
             date: "2024-01-08T09:48:33Z"
             query_parameters: "body,labels,title"
+
+        - name: Show test output
+          run: |
+            echo "${{ steps.test-action.outputs.raw-output }}"
+            echo "${{ steps.test-action.outputs.label-list }}"
+            echo "${{ steps.test-action.outputs.bump-increment }}"
