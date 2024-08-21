@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-        - name: test custom action
+        - name: Run action
           id: test-action
           uses: ynput/github-data@main
           with:
@@ -16,8 +16,14 @@ jobs:
             date: "2024-01-08T09:48:33Z"
             query_parameters: "body,labels,title"
 
-        - name: Show test output
+        - name: Test empty pr output
+          if: ${{ steps.test-action.outputs.raw-output }}
           run: |
-            echo raw-output: ${{ steps.test-action.outputs.raw-output }}
-            echo 'labels: ${{ steps.test-action.outputs.label-list }}'
-            echo 'increment: ${{ steps.test-action.outputs.bump-increment }}'
+            echo "::error:: Empty output was detecetd as input."
+            exit 1
+
+        - name: Test empty pr output
+          if: ${{ steps.test-action.outputs.label-list }}
+          run: |
+            echo "::error:: Empty output was detecetd as input."
+            exit 1

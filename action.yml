@@ -42,7 +42,7 @@ runs:
       run: |
         raw_output=$(gh pr list --state merged --search 'merged:>=${{ inputs.date }}' --json ${{ inputs.query_parameters }} --repo ${{ inputs.repo }})
         if [ raw_output == '[]' ]; then
-          echo "raw_output=''" >> $GITHUB_OUTPUT
+          echo "raw_output=" >> $GITHUB_OUTPUT
           exit 0
         fi
 
@@ -54,6 +54,11 @@ runs:
       run: |
         cd $GITHUB_ACTION_PATH
         label_list=$(python -c 'import fetch_github_data; print(fetch_github_data.get_labels())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        if [ label_list == '[]' ]; then
+          echo "label_list=" >> $GITHUB_OUTPUT
+          exit 0
+        fi
+
         echo "label_list=$label_list" >> $GITHUB_OUTPUT
 
     - name: Get bump increment
