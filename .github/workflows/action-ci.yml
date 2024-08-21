@@ -19,11 +19,11 @@ jobs:
         - name: Test empty pr output
           if: ${{ steps.test-action.outputs.raw-output }}
           run: |
-            echo "::error:: Empty output was detecetd as input."
+            echo "::error:: Found value: ${{ steps.test-action.outputs.raw-output }}, expected empty value"
             exit 1
 
         - name: Test empty pr output
           if: ${{ steps.test-action.outputs.label-list }}
           run: |
-            echo "::error:: Empty output was detecetd as input."
+            echo "::error:: Found value: ${{ steps.test-action.outputs.label-list }}, expected empty value"
             exit 1
