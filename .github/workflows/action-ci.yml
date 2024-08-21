@@ -18,6 +18,6 @@ jobs:
 
         - name: Show test output
           run: |
-            echo 'raw-output: ${{ steps.test-action.outputs.raw-output }}''
+            echo 'raw-output: ${{ steps.test-action.outputs.raw-output }}'
             echo 'labels: ${{ steps.test-action.outputs.label-list }}'
             echo 'increment: ${{ steps.test-action.outputs.bump-increment }}'
