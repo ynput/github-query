@@ -2,24 +2,26 @@ import argparse
 import json
 import subprocess
 
+repo_name = None
+
 def collect_inputs():
     """Get parameters for gh command.
 
     Returns:
         json dict: dictionary retunred from github api.
     """
-
+    # TODO split between providing parameters and returning raw data
     parser = argparse.ArgumentParser(description="A python script to convert github pr information to a more simple format.")
     parser.add_argument("repo", type=str, help="Repository name consisting of 'repo-owner/repo-name'")
     parser.add_argument('query_parameters', type=str, help='Keys to query for.')
     parser.add_argument('date', type=str, default="2024-07-08T09:48:33Z", help='Latest release date.')
     args = parser.parse_args()
 
-    repo = args.repo
+    repo_name = args.repo
     query_tags = args.query_parameters.split(',')
     latest_release_date = args.date
 
-    command = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo}"
+    command = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo_name}"
     pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     return json.loads(pr_json.stdout)
 
@@ -88,7 +90,7 @@ def get_labels():
     return json.dumps(list(labels))
 
 def get_version_increment():
-    # TODO get rpo string dynamically
+    # TODO get repo string dynamically
     minor_bump_label= subprocess.run(
         ["gh", "variable", "get", "MINOR_BUMP_LABEL", "--repo", "ynput/ayon-addon-action-testing"],
         capture_output=True,
