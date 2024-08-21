@@ -84,7 +84,7 @@ def prepare_changelog_markdown(collect_inputs, get_changelog):
     return pr_output_list
 
 def get_labels():
-    github_data = get_inputs(get_raw_output())
+    github_data = get_raw_output(*get_inputs())
     labels = set()
 
     for item in github_data:
