@@ -30,7 +30,7 @@ outputs:
     value: ${{ steps.bump-increment.output.increment }}
   changelog-markdown:
     description: String containing full makrdown syntax for release changelog information
-    value: # TODO changelog markdown string
+    value: "Default Value"  # TODO changelog markdown string
 
 runs:
   using: composite
@@ -52,6 +52,7 @@ runs:
 
     - name: Get bump increment
       id: bump-increment
+      shell: bash
       run: |
         increment=$(python -c 'import fetch_github_data; print(fetch_github_data.get_version_increment())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "increment=$increment" >> GITHUB_OUTPUT

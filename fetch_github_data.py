@@ -62,6 +62,7 @@ def changelog_per_label(json_dict):
 
 def prepare_changelog_markdown(collect_inputs, get_changelog):
     pr_output_list = []
+    pr_output = {}
 
     for pr_data in collect_inputs():
         labels = pr_data["labels"]
@@ -87,10 +88,25 @@ def get_labels():
     return json.dumps(list(labels))
 
 def get_version_increment():
-    for label in json.loads(get_labels()):
-        # TODO get bump label strings from repo vars
-        if label.lower() == "enhancement" or label.lower == "feature":
-            return "minor"
-        if label.lower() == "bug":
-            return "patch"
+    # TODO get rpo string dynamically
+    minor_bump_label= subprocess.run(
+        ["gh", "variable", "get", "MINOR_BUMP_LABEL", "--repo", "ynput/ayon-addon-action-testing"],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    minor_bump_label_list = minor_bump_label.stdout.strip().split(", " or ",")
 
+    patch_bump_label= subprocess.run(
+        ["gh", "variable", "get", "PATCH_BUMP_LABEL", "--repo", "ynput/ayon-addon-action-testing"],
+        capture_output=True,
+        text=True,
+        check=True
+    )
+    patch_bump_label_list = patch_bump_label.stdout.strip().split(", " or ",")
+
+    for label in json.loads(get_labels()):
+        if label.lower() in minor_bump_label_list:
+            return "minor"
+        if label.lower() in patch_bump_label_list:
+            return "patch"
