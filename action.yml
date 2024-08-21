@@ -21,13 +21,13 @@ inputs:
 outputs:
   raw-output:
     description: Full output json dictionary from github api.
-    value: ${{ steps.raw-output.output.raw_output }}
+    value: ${{ steps.raw-output.outputs.raw_output }}
   label-list:
     description: List of unique labels found in PRs.
-    value: ${{ steps.get-labels-list.output.label_list }}
+    value: ${{ steps.get-labels-list.outputs.label_list }}
   bump-increment:
     description: Increment for version bumping - either `patch` or 'minor'
-    value: ${{ steps.bump-increment.output.increment }}
+    value: ${{ steps.bump-increment.outputs.increment }}
   changelog-markdown:
     description: String containing full makrdown syntax for release changelog information
     value: "Default Value"  # TODO changelog markdown string
@@ -42,7 +42,7 @@ runs:
       run: |
         raw_output=$(gh pr list --state merged --search 'merged:>=${{ inputs.date }}' --json ${{ inputs.query_parameters }} --repo ${{ inputs.repo }})
         echo $raw_output
-        echo "raw_output=$raw_output" >> ${GITHUB_OUTPUT}
+        echo "raw_output=$raw_output" >> $GITHUB_OUTPUT
 
     - name: Get label list
       id: get-labels-list
@@ -51,7 +51,7 @@ runs:
         cd ${GITHUB_ACTION_PATH}
         label_list=$(python -c 'import fetch_github_data; fetch_github_data.get_labels()' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo $label_list
-        echo "label_list=$label_list" >> ${GITHUB_OUTPUT}
+        echo "label_list=$label_list" >> $GITHUB_OUTPUT
 
     - name: Get bump increment
       id: bump-increment
@@ -60,6 +60,6 @@ runs:
         cd ${GITHUB_ACTION_PATH}
         increment=$(python -c 'import fetch_github_data; print(fetch_github_data.get_version_increment())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo $increment
-        echo "increment=$increment" >> ${GITHUB_OUTPUT}
+        echo "increment=$increment" >> $GITHUB_OUTPUT
 
 ...
