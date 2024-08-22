@@ -1,25 +1,39 @@
+"""
+This script is written in a certain - maybe even unconventional way - by intention.
+It's supposed to be run from comamndline right away to be used in a github action workflow yaml file.
+Additonally it's test suite relies mainly on putest and therefore the functions need to be importable to the pytest script.
+"""
+
 import argparse
 import json
 import subprocess
 
-repo_name = None
+parsed_args = None
+
+def parse_arguments():
+    """Parse command-line arguments and store them in a global variable."""
+    global parsed_args
+    if parsed_args is None:
+        parser = argparse.ArgumentParser(description="A python script to convert GitHub PR information to a more simple format.")
+        parser.add_argument("repo", type=str, help="Repository name consisting of 'repo-owner/repo-name'")
+        parser.add_argument("query_parameters", type=str, help="Keys to query for.")
+        parser.add_argument("date", type=str, default="2024-07-08T09:48:33Z", help="Latest release date.")
+        parsed_args = parser.parse_args()
+
 
 def get_inputs():
-    """Get terminal parameters.
+    """Get the parsed command-line arguments.
 
     Returns:
         tuple(str): Parameters as string tuple.
     """
 
-    parser = argparse.ArgumentParser(description="A python script to convert github pr information to a more simple format.")
-    parser.add_argument("repo", type=str, help="Repository name consisting of 'repo-owner/repo-name'")
-    parser.add_argument('query_parameters', type=str, help='Keys to query for.')
-    parser.add_argument('date', type=str, default="2024-07-08T09:48:33Z", help='Latest release date.')
-    args = parser.parse_args()
-
-    repo_name = args.repo
-    query_tags = args.query_parameters.split(',')
-    latest_release_date = args.date
+    if parsed_args is None:
+        parse_arguments()
+    
+    repo_name = parsed_args.repo
+    query_tags = parsed_args.query_parameters.split(',')
+    latest_release_date = parsed_args.date
 
     return repo_name, query_tags, latest_release_date
 
@@ -80,7 +94,7 @@ def prepare_changelog_markdown():
     for pr in pr_query:
         # get all label names in a list
         pr_label_list = [label["name"] for label in pr["labels"]]
-        fitlered_label = list(set(label_list).intersection(pr_label_list))[0]  # any(label in label_list for label in pr_label_list)
+        fitlered_label = list(set(label_list).intersection(pr_label_list))[0]
 
         if fitlered_label:
             change_list = get_changelog(pr_data=pr["body"], changelog_start="## Changes")
@@ -125,3 +139,6 @@ def get_version_increment():
             return "minor"
         if label.lower() in patch_bump_label_list:
             return "patch"
+
+if __name__ == "__main__":
+    parse_arguments()
