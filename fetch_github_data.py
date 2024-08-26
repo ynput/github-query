@@ -73,7 +73,8 @@ def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
     return changelog_lines
 
 def changelog_per_label(json_dict):
-    changelog_labels = ["bug", "enhancement", "feature"]
+    # TODO repalce with labels fetched from tepo variables
+    changelog_labels = ["bugfix", "enhancement", "feature"]
     labels = []
     for item in json_dict:
         labels.append(item["labels"])
@@ -97,7 +98,7 @@ def prepare_changelog_markdown():
         fitlered_label = list(set(label_list).intersection(pr_label_list))[0]
 
         if fitlered_label:
-            change_list = get_changelog(pr_data=pr["body"], changelog_start="## Changes")
+            change_list = get_changelog(pr_data=pr["body"])
             
             changelog += f"## {fitlered_label.capitalize()}\n"
             changelog += "".join([f"* {change}\n" for change in change_list])

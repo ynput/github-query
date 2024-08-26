@@ -71,12 +71,12 @@ runs:
         increment=$(python -c 'import fetch_github_data; print(fetch_github_data.get_version_increment())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "increment=$increment" >> $GITHUB_OUTPUT
 
-    - name: Get bump increment
+    - name: Prepare Changelog
       id: write-changelog
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        increment=$(python -c 'import fetch_github_data; print(fetch_github_data.prepare_changelog_markdown())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        changelog=$(python -c 'import fetch_github_data; print(fetch_github_data.prepare_changelog_markdown())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "changelog=$changelog" >> $GITHUB_OUTPUT
 
 ...
