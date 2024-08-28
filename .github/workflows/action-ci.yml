@@ -13,7 +13,7 @@ jobs:
           uses: ynput/github-data@main
           with:
             repo: "ynput/ayon-addon-action-testing"
-            date: "2024-20-08T09:48:33Z"
+            date: "2024-08-20T12:03:23Z"
             query_parameters: "body,labels,title"
 
         - name: Test empty pr output
