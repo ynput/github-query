@@ -1,6 +1,7 @@
 import pytest
+from unittest.mock import patch
 
-import fetch_github_data
+import github_query
 
 @pytest.fixture
 def pr_api_output():
@@ -52,13 +53,54 @@ def pr_api_output_missing_label():
         }
         ]
 
-def test_get_labels_missign_input(pr_api_output):
-    labels = fetch_github_data.get_labels(pr_api_output)
+@pytest.fixture
+def minor_bump():
+    return ["feature", "enhancement"]
 
-    # TODO order should not matter but datatype does
-    assert sorted(labels) == sorted(["bug", "enhancement"])
+@pytest.fixture
+def patch_bump():
+    return ["bugfix"]
 
-def test_get_labels(pr_api_output_missing_label):
-    labels = fetch_github_data.get_labels(pr_api_output_missing_label)
+def mock_get_labels_patch():
+    return '["bugfix"]'
 
-    assert sorted(labels) == sorted(["bug", "enhancement"])
+def mock_get_labels_minor():
+    return '["feature", "enhancement"]'
+
+def mock_get_labels_none():
+    return '[]'
+
+
+# Get PR Label test-cases
+
+def test_get_labels(pr_api_output):
+    labels = github_query.get_labels(pr_api_output)
+
+    assert isinstance(labels, list)
+    assert set(labels) == {"bug", "enhancement"}
+
+def test_get_labels_missign_input(pr_api_output_missing_label):
+    labels = github_query.get_labels(pr_api_output_missing_label)
+
+    assert labels == None
+
+
+# Version Increment test-cases
+
+@patch('github_query.get_labels', return_value=mock_get_labels_patch())
+def test_get_version_increment_patch(mock_get_labels_patch, minor_bump, patch_bump):
+    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump)
+
+    assert increment == "patch"
+
+@patch('github_query.get_labels', return_value=mock_get_labels_minor())
+def test_get_version_increment_minor(mock_get_labels_minor, minor_bump, patch_bump):
+    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump)
+
+    assert increment == "minor"
+
+@patch('github_query.get_labels', return_value=mock_get_labels_none())
+def test_get_version_increment_none(mock_get_labels_none, minor_bump, patch_bump):
+    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump)
+
+    assert increment == None

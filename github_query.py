@@ -100,18 +100,16 @@ def get_labels(pr_data: dict) -> list:
         pr_data (dict): Github PR query result
 
     Returns:
-        [str]: Liste of unique labels strigns found.
+        [str]: Liste of unique labels strings found or `None`.
     """
 
     labels = set()
 
     for item in pr_data:
         if not item.get("labels"):
-            logger.error(f"No labels found in {item}")
             return
         for label in item["labels"]:
-            if not label["name"]:
-                logger.error(f"No label name found in {label}")
+            if not label.get("name"):
                 return
 
             labels.add(label["name"])
@@ -119,7 +117,7 @@ def get_labels(pr_data: dict) -> list:
     return list(labels)
 
 def get_repo_label(repo, label_name):
-   
+
     label= subprocess.run(
         ["gh", "variable", "get", label_name, "--repo", repo],
         capture_output=True,
@@ -129,13 +127,19 @@ def get_repo_label(repo, label_name):
 
     return label.stdout.strip().split(", " or ",")
 
-def get_version_increment():
+def get_version_increment(patch_bump_list, minor_bump_list):
+    """Figure out version increment based on PR labels.
 
-    minor_bump_label_list = get_repo_label(repo=repo_name, label_name="MINOR_BUMP_LABEL")
-    patch_bump_label_list = get_repo_label(repo=repo_name, label_name="PATCH_BUMP_LABEL")
+    Args:
+        patch_bump_list (list[str]): Labels for bumping patch version
+        minor_bump_list (list[str]): Labels for bumping minor version
+
+    Returns:
+        str: version increment
+    """
 
     for label in json.loads(get_labels()):
-        if label.lower() in minor_bump_label_list:
+        if label.lower() in minor_bump_list:
             return "minor"
-        if label.lower() in patch_bump_label_list:
+        if label.lower() in patch_bump_list:
             return "patch"

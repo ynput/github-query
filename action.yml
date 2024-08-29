@@ -55,7 +55,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        label_list=$(python -c 'import fetch_github_data; print(fetch_github_data.get_labels(fetch_github_data.parse_args()))'  "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        label_list=$(python -c 'import github_query; print(github_query.get_labels(github_query.parse_args()))'  "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         if [[ "$label_list" == '[]' ]]; then
           echo "label_list=''" >> $GITHUB_OUTPUT
           exit 0
@@ -63,12 +63,13 @@ runs:
 
         echo "label_list=$label_list" >> $GITHUB_OUTPUT
 
-    - name: Get bump increment
+    - name: Get version increment
       id: bump-increment
       shell: bash
+      # TODO fix bash command
       run: |
         cd $GITHUB_ACTION_PATH
-        increment=$(python -c 'import fetch_github_data; print(fetch_github_data.get_version_increment())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        increment=$(python -c 'import github_query; print(github_query.get_version_increment(github_query.get_repo_label()))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "increment=$increment" >> $GITHUB_OUTPUT
 
     - name: Prepare Changelog
