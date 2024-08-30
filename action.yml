@@ -66,10 +66,9 @@ runs:
     - name: Get version increment
       id: bump-increment
       shell: bash
-      # TODO fix bash command
       run: |
         cd $GITHUB_ACTION_PATH
-        increment=$(python -c 'import github_query; print(github_query.get_version_increment(github_query.get_repo_label()))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_vars = github_query.get_repo_labels("${{ inputs.repo }}"; minor_repo_vars = github_query.get_repo_labels("${{ inputs.repo }}", "MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_vars, minor_bump_list=minor_repo_vars, pr_label_list=pr_labels)' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "increment=$increment" >> $GITHUB_OUTPUT
 
     - name: Prepare Changelog
@@ -77,7 +76,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        changelog=$(python -c 'import fetch_github_data; print(fetch_github_data.prepare_changelog_markdown())' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        changelog=$(python -c 'import github_query; gh_query = github_query.github_query.parse_args(); patch_repo_vars = github_query.get_repo_labels("${{ inputs.repo }}"; minor_repo_vars = github_query.get_repo_labels("${{ inputs.repo }}", "MINOR_BUMP_LABEL"); print(fetch_github_data.prepare_changelog_markdown(pr_query=gh_query, minor_bump_list=minor_repo_vars, patch_bump_list=patch_repo_vars))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         oneline_changelog=$(echo "$changelog" | base64)
         echo "oneline changelog: $oneline_changelog"
         echo "changelog=$oneline_changelog" >> $GITHUB_OUTPUT

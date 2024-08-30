@@ -61,14 +61,17 @@ def minor_bump():
 def patch_bump():
     return ["bugfix"]
 
-def mock_get_labels_patch():
-    return '["bugfix"]'
+@pytest.fixture
+def pr_labels_bug():
+    return ["bugfix"]
 
-def mock_get_labels_minor():
-    return '["feature", "enhancement"]'
+@pytest.fixture
+def pr_labels_enhancement():
+    return ["enhancement"]
 
-def mock_get_labels_none():
-    return '[]'
+@pytest.fixture
+def pr_labels_none():
+    return []
 
 
 # Get PR Label test-cases
@@ -87,20 +90,17 @@ def test_get_labels_missign_input(pr_api_output_missing_label):
 
 # Version Increment test-cases
 
-@patch('github_query.get_labels', return_value=mock_get_labels_patch())
-def test_get_version_increment_patch(mock_get_labels_patch, minor_bump, patch_bump):
-    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump)
+def test_get_version_increment_patch(minor_bump, patch_bump, pr_labels_bug):
+    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_bug)
 
     assert increment == "patch"
 
-@patch('github_query.get_labels', return_value=mock_get_labels_minor())
-def test_get_version_increment_minor(mock_get_labels_minor, minor_bump, patch_bump):
-    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump)
+def test_get_version_increment_minor(minor_bump, patch_bump, pr_labels_enhancement):
+    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_enhancement)
 
     assert increment == "minor"
 
-@patch('github_query.get_labels', return_value=mock_get_labels_none())
-def test_get_version_increment_none(mock_get_labels_none, minor_bump, patch_bump):
-    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump)
+def test_get_version_increment_none(minor_bump, patch_bump, pr_labels_none):
+    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_none)
 
     assert increment == None

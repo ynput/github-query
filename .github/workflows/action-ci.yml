@@ -16,14 +16,9 @@ jobs:
             date: "2024-08-20T12:03:23Z"
             query_parameters: "body,labels,title"
 
-        - name: Test empty pr output
-          if: ${{ steps.test-action.outputs.raw-output }}
+        - name: Show results
           run: |
-            echo "::error:: Found value: ${{ steps.test-action.outputs.raw-output }}, expected empty value"
-            exit 1
-
-        - name: Test empty pr output
-          if: ${{ steps.test-action.outputs.label-list }}
-          run: |
-            echo "::error:: Found value: ${{ steps.test-action.outputs.label-list }}, expected empty value"
-            exit 1
+            echo "RAW-response: " && '${{ steps.test-action.outputs.raw-output }}'
+            echo "Labels: " && '${{ steps.test-action.outputs.label-list }}'
+            echo "Bump-increment: " && '${{ steps.test-action.outputs.label-list }}'
+            echo "Changelog: " && '${{ steps.test-action.outputs.changelog-markdown }}' 

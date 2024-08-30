@@ -68,14 +68,9 @@ def changelog_per_label(json_dict):
         if any(item in changelog_labels for item in labels):
             pass
 
-def prepare_changelog_markdown():
-    pr_query = gh_pr_query(repo_name=repo_name, query_tags=query_tags, latest_release_date=latest_release_date)
-   
-    minor_bump_label_list = get_repo_label(repo=repo_name, label_name="MINOR_BUMP_LABEL")
-    patch_bump_label_list = get_repo_label(repo=repo_name, label_name="PATCH_BUMP_LABEL")
-    
+def prepare_changelog_markdown(pr_query, minor_bump_list, patch_bump_list):   
     # ? should version bump labels also be filter for changelog ?
-    label_list = minor_bump_label_list + patch_bump_label_list
+    label_list = minor_bump_list + patch_bump_list
     changelog = ""
 
     for pr in pr_query:
@@ -117,7 +112,15 @@ def get_labels(pr_data: dict) -> list:
     return list(labels)
 
 def get_repo_label(repo, label_name):
+    """Query labels from repository variables.
 
+    Args:
+        repo (str): Repository name `owner/repo-name`
+        label_name (str): Repo variable name
+
+    Returns:
+        [str]: list of found strings in variable
+    """
     label= subprocess.run(
         ["gh", "variable", "get", label_name, "--repo", repo],
         capture_output=True,
@@ -127,18 +130,19 @@ def get_repo_label(repo, label_name):
 
     return label.stdout.strip().split(", " or ",")
 
-def get_version_increment(patch_bump_list, minor_bump_list):
+def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label_list: list):
     """Figure out version increment based on PR labels.
 
     Args:
-        patch_bump_list (list[str]): Labels for bumping patch version
-        minor_bump_list (list[str]): Labels for bumping minor version
+        patch_bump_list ([str]): Labels for bumping patch version
+        minor_bump_list ([str]): Labels for bumping minor version
+        label_list([str]): Labels found in PRs
 
     Returns:
         str: version increment
     """
 
-    for label in json.loads(get_labels()):
+    for label in pr_label_list:
         if label.lower() in minor_bump_list:
             return "minor"
         if label.lower() in patch_bump_list:
