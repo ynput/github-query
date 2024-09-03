@@ -68,36 +68,8 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        REPO="${{ inputs.repo }}"
-        PATCH_LABEL="PATCH_BUMP_LABEL"
-        MINOR_LABEL="MINOR_BUMP_LABEL"
-    
-        # Run Python script to get version increment
-        increment=$(python - <<EOF
-        import github_query
-
-        # Retrieve labels from the pull request
-        pr_labels = github_query.get_labels(github_query.parse_args())
-
-        # Get the patch and minor bump labels from the repository
-        patch_repo_var = github_query.get_repo_var(repo="$REPO", var_name="$PATCH_LABEL")
-        minor_repo_var = github_query.get_repo_var(repo="$REPO", var_name="$MINOR_LABEL")
-
-        # Calculate the version increment
-        increment = github_query.get_version_increment(
-            patch_bump_list=patch_repo_var,
-            minor_bump_list=minor_repo_var,
-            pr_label_list=pr_labels
-        )
-
-        print(increment)
-        EOF
-            )
-    
-        # Set the output variable for the GitHub Action
+        increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_var, minor_bump_list=minor_repo_var, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "increment=$increment" >> $GITHUB_OUTPUT
-        # increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_var, minor_bump_list=minor_repo_var, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
-        # echo "increment=$increment" >> $GITHUB_OUTPUT
 
     - name: Prepare Changelog
       id: write-changelog
