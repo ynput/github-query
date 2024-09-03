@@ -68,7 +68,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_vars = github_query.get_repo_labels("${{ inputs.repo }}"; minor_repo_vars = github_query.get_repo_labels("${{ inputs.repo }}", "MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_vars, minor_bump_list=minor_repo_vars, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_vars = github_query.get_repo_labels(repo="${{ inputs.repo }}", label_name="PATCH_BUMP_LABEL"); minor_repo_vars = github_query.get_repo_labels(repo="${{ inputs.repo }}", label_name="MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_vars, minor_bump_list=minor_repo_vars, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "increment=$increment" >> $GITHUB_OUTPUT
 
     - name: Prepare Changelog
