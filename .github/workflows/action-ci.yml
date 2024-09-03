@@ -18,7 +18,7 @@ jobs:
 
         - name: Show results
           run: |
-            echo "RAW-response: " && '${{ steps.test-action.outputs.raw-output }}'
+            echo '${{ steps.test-action.outputs.raw-output }}'
             echo "Labels: " && '${{ steps.test-action.outputs.label-list }}'
             echo "Bump-increment: " && '${{ steps.test-action.outputs.label-list }}'
             echo "Changelog: " && '${{ steps.test-action.outputs.changelog-markdown }}'
