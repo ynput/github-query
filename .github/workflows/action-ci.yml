@@ -21,7 +21,9 @@ jobs:
           fetch-depth: 0
       
       - name: Run Pytest
+      # TODO try this one: https://github.com/pavelzw/pytest-action
         run: |
+          pip install pytest pytest-cov
           pytest
 
   run-action:
