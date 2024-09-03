@@ -55,7 +55,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        label_list=$(python -c 'import github_query; print(github_query.get_label(github_query.parse_args()))'  "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        label_list=$(python -c 'import github_query; print(github_query.get_labels(github_query.parse_args()))'  "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         if [[ "$label_list" == '[]' ]]; then
           echo "label_list=''" >> $GITHUB_OUTPUT
           exit 0
