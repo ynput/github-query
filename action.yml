@@ -76,7 +76,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        changelog=$(python -c 'import github_query; gh_query = github_query.parse_args(); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(fetch_github_data.prepare_changelog_markdown(pr_query=gh_query, minor_bump_list=minor_repo_var, patch_bump_list=patch_repo_))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        changelog=$(python -c 'import github_query; gh_query = github_query.parse_args(); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.prepare_changelog_markdown(pr_query=gh_query, minor_bump_list=minor_repo_var, patch_bump_list=patch_repo_))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         oneline_changelog=$(echo "$changelog" | base64 | tr -d '/n')
         echo "oneline changelog: $oneline_changelog"
         echo "changelog=$oneline_changelog" >> $GITHUB_OUTPUT
