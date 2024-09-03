@@ -111,18 +111,18 @@ def get_labels(pr_data: dict) -> list:
 
     return list(labels)
 
-def get_repo_label(repo, label_name):
+def get_repo_var(repo, var_name):
     """Query labels from repository variables.
 
     Args:
         repo (str): Repository name `owner/repo-name`
-        label_name (str): Repo variable name
+        var_name (str): Repo variable name
 
     Returns:
         [str]: list of found strings in variable
     """
     label= subprocess.run(
-        ["gh", "variable", "get", label_name, "--repo", repo],
+        ["gh", "variable", "get", var_name, "--repo", repo],
         capture_output=True,
         text=True,
         check=True
