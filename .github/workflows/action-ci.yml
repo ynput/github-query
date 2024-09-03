@@ -45,4 +45,4 @@ jobs:
             echo "RAW-response: " && echo '${{ steps.test-action.outputs.raw-output }}'
             echo "Labels: " && echo '${{ steps.test-action.outputs.label-list }}'
             echo "Bump-increment: " && echo '${{ steps.test-action.outputs.label-list }}'
-            echo "Changelog: " && echo '${{ steps.test-action.outputs.changelog-markdown }}'
+            # echo "Changelog: " && echo '${{ steps.test-action.outputs.changelog-markdown }}'
