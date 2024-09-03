@@ -77,13 +77,13 @@ def pr_labels_none():
 # Get PR Label test-cases
 
 def test_get_labels(pr_api_output):
-    labels = github_query.get_repo_var(pr_api_output)
+    labels = github_query.get_labels(pr_data=pr_api_output)
 
     assert isinstance(labels, list)
     assert set(labels) == {"bug", "enhancement"}
 
 def test_get_labels_missign_input(pr_api_output_missing_label):
-    labels = github_query.get_repo_var(pr_api_output_missing_label)
+    labels = github_query.get_labels(pr_data=pr_api_output_missing_label)
 
     assert labels == None
 
