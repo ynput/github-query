@@ -23,8 +23,8 @@ def pr_api_output():
             "labels": [
             {
                 "id": "LA_kwDOMje8_88AAAABtOJ1Gw",
-                "name": "bug",
-                "description": "Something isn't working",
+                "name": "bugfix",
+                "description": "Something got fixed",
                 "color": "ff9195"
             }
             ],
@@ -80,7 +80,7 @@ def test_get_labels(pr_api_output):
     labels = github_query.get_labels(pr_data=pr_api_output)
 
     assert isinstance(labels, list)
-    assert set(labels) == {"bug", "enhancement"}
+    assert set(labels) == {"bugfix", "enhancement"}
 
 def test_get_labels_missign_input(pr_api_output_missing_label):
     labels = github_query.get_labels(pr_data=pr_api_output_missing_label)
