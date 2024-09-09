@@ -142,10 +142,6 @@ def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label
         str: version increment
     """
 
-    print(f"pr_label_list: {pr_label_list}")
-    print(f"minor_bump_list: {minor_bump_list}")
-    print(f"patch_bump_list: {patch_bump_list}")
-
     if any(label in pr_label_list for label in minor_bump_list):
         return "minor"
 
