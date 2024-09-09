@@ -46,3 +46,18 @@ jobs:
             echo "Labels: " && echo '${{ steps.test-action.outputs.label-list }}'
             echo "Bump-increment: " && echo '${{ steps.test-action.outputs.bump-increment }}'
             # echo "Changelog: " && echo '${{ steps.test-action.outputs.changelog-markdown }}'
+
+        - name: Run action
+          id: second-test-action
+          uses: ynput/github-query@main
+          with:
+            repo: "ynput/ayon-addon-action-testing"
+            date: "2024-08-20T12:03:23Z"
+            query_parameters: "body,labels,title"
+
+        - name: Show results
+          run: |
+            echo "RAW-response: " && echo '${{ steps.test-action.outputs.raw-output }}'
+            echo "Labels: " && echo '${{ steps.test-action.outputs.label-list }}'
+            echo "Bump-increment: " && echo '${{ steps.test-action.outputs.bump-increment }}'
+            # echo "Changelog: " && echo '${{ steps.test-action.outputs.changelog-markdown }}'
