@@ -67,11 +67,11 @@ def pr_labels_bug():
 
 @pytest.fixture
 def pr_labels_enhancement():
-    return ["enhancement"]
+    return ["bugfix", "documentation", "feature", "enhancement"]
 
 @pytest.fixture
 def pr_labels_none():
-    return []
+    return ["documentation", "wontfix"]
 
 
 # Get PR Label test-cases
