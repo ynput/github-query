@@ -141,7 +141,7 @@ def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label
     Returns:
         str: version increment
     """
-
+    # TODO add major bump option
     if any(label in pr_label_list for label in minor_bump_list):
         return "minor"
 
