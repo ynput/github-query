@@ -70,8 +70,16 @@ def pr_labels_enhancement():
     return ["bugfix", "documentation", "feature", "enhancement"]
 
 @pytest.fixture
-def pr_labels_none():
+def pr_labels_wrong_labels():
     return ["documentation", "wontfix"]
+
+@pytest.fixture
+def pr_labels_empty_list():
+    return []
+
+@pytest.fixture
+def pr_labels_none():
+    return None
 
 
 # Get PR Label test-cases
@@ -82,7 +90,7 @@ def test_get_labels(pr_api_output):
     assert isinstance(labels, list)
     assert set(labels) == {"bugfix", "enhancement"}
 
-def test_get_labels_missign_input(pr_api_output_missing_label):
+def test_get_labels_missing_input(pr_api_output_missing_label):
     labels = github_query.get_labels(pr_data=pr_api_output_missing_label)
 
     assert labels == None
@@ -100,7 +108,17 @@ def test_get_version_increment_minor(minor_bump, patch_bump, pr_labels_enhanceme
 
     assert increment == "minor"
 
+def test_get_version_increment_wrong_labels(minor_bump, patch_bump, pr_labels_wrong_labels):
+    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_wrong_labels)
+
+    assert increment == None
+
 def test_get_version_increment_none(minor_bump, patch_bump, pr_labels_none):
     increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_none)
+
+    assert increment == None
+
+def test_get_version_increment_ampty_list(minor_bump, patch_bump, pr_labels_empty_list):
+    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_empty_list)
 
     assert increment == None
