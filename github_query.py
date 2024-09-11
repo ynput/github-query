@@ -102,10 +102,10 @@ def get_labels(pr_data: dict) -> list:
 
     for item in pr_data:
         if not item.get("labels"):
-            return
+            return []
         for label in item["labels"]:
             if not label.get("name"):
-                return
+                return []
 
             labels.add(label["name"])
 

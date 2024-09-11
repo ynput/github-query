@@ -93,7 +93,7 @@ def test_get_labels(pr_api_output):
 def test_get_labels_missing_input(pr_api_output_missing_label):
     labels = github_query.get_labels(pr_data=pr_api_output_missing_label)
 
-    assert labels == None
+    assert labels == []
 
 
 # Version Increment test-cases
