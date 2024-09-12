@@ -111,14 +111,14 @@ def test_get_version_increment_minor(minor_bump, patch_bump, pr_labels_enhanceme
 def test_get_version_increment_wrong_labels(minor_bump, patch_bump, pr_labels_wrong_labels):
     increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_wrong_labels)
 
-    assert increment == None
+    assert increment == ""
 
 def test_get_version_increment_none(minor_bump, patch_bump, pr_labels_none):
     increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_none)
 
-    assert increment == None
+    assert increment == ""
 
 def test_get_version_increment_ampty_list(minor_bump, patch_bump, pr_labels_empty_list):
     increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_empty_list)
 
-    assert increment == None
+    assert increment == ""
