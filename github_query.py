@@ -7,6 +7,7 @@ Additonally it's test suite relies mainly on putest and therefore the functions 
 import argparse
 import json
 import logging
+import re
 import subprocess
 
 
@@ -128,7 +129,9 @@ def get_repo_var(repo, var_name):
         check=True
     )
 
-    return label.stdout.strip().split(", " or ",")
+    # TODO enable testing for this conversion
+    return re.split(r',\s*', label.stdout.strip())
+
 
 def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label_list: list):
     """Figure out version increment based on PR labels.
