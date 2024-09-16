@@ -55,12 +55,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        label_list=$(python -c 'import github_query; print(github_query.get_labels(github_query.parse_args()))'  "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
-        if [[ "$label_list" == '[]' ]]; then
-          echo "label_list=''" >> $GITHUB_OUTPUT
-          exit 0
-        fi
-
+        label_list=$(python github_query.py pr-labels "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "label_list=$label_list" >> $GITHUB_OUTPUT
 
     - name: Get version increment
@@ -68,7 +63,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_var, minor_bump_list=minor_repo_var, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        increment=$(python github_query.py version-increment "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
         echo "increment=$increment" >> $GITHUB_OUTPUT
 
     # disabled until fixed

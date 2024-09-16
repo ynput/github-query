@@ -4,7 +4,7 @@ It's supposed to be run from comamndline right away to be used in a github actio
 Additonally it's test suite relies mainly on putest and therefore the functions need to be importable to the pytest script.
 """
 
-import argparse
+import click
 import json
 import logging
 import re
@@ -13,24 +13,34 @@ import subprocess
 
 logger = logging.getLogger(__name__)
 
-def parse_args() -> dict:
-    """Parse command-line arguments and store them in a global variable."""
+def query_merged_prs(latest_release_date, query_tags, repo_name):
+    """Run gh pull request query.
 
-    parser = argparse.ArgumentParser(description="A python script to convert GitHub PR information to a more simple format.")
-    parser.add_argument("repo", type=str, help="Repository name consisting of 'repo-owner/repo-name'")
-    parser.add_argument("query_parameters", type=str, help="Keys to query for.")
-    parser.add_argument("date", type=str, default="2024-07-08T09:48:33Z", help="Latest release date.")
-    parsed_args = parser.parse_args()
+    Args:
+        latest_release_date (str): datatime string
+        query_tags (str): csv string
+        repo_name (str): repo name as <owner><repo>
 
-    repo_name = parsed_args.repo
-    query_tags = parsed_args.query_parameters.split(',')
-    latest_release_date = parsed_args.date
+    Returns:
+        dict: json-dictionary.
+    """
 
-    command = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo_name}"
-    pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    pr_list = subprocess.run(
+        [
+            "gh", "pr", "list", 
+            "--state", "merged", 
+            "--search", f'merged:>={latest_release_date}', 
+            "--json", ','.join(query_tags), 
+            "--repo", repo_name
+        ],
+        capture_output=True,
+        text=True,
+        check=True
+    )
 
-    return json.loads(pr_json.stdout)
+    return json.loads(pr_list.stdout)
 
+# INFO not in use
 def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
     """Get list of changes from a PRs changelog.
 
@@ -60,6 +70,7 @@ def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
 
     return changelog_lines
 
+# INFO not in use
 def changelog_per_label(json_dict):
     # TODO replace with labels fetched from repo variables
     changelog_labels = ["bugfix", "enhancement", "feature"]
@@ -69,6 +80,7 @@ def changelog_per_label(json_dict):
         if any(item in changelog_labels for item in labels):
             pass
 
+# INFO not in use
 def prepare_changelog_markdown(pr_query, minor_bump_list, patch_bump_list):   
     # ? should version bump labels also be filter for changelog ?
     label_list = minor_bump_list + patch_bump_list
@@ -96,19 +108,22 @@ def get_labels(pr_data: dict) -> list:
         pr_data (dict): Github PR query result
 
     Returns:
-        [str]: Liste of unique labels strings found or `None`.
+        list: Liste of unique labels strings found or `None`.
     """
 
     labels = set()
 
     for item in pr_data:
         if not item.get("labels"):
+            logger.warning("No PR label data found.")
             return []
         for label in item["labels"]:
             if not label.get("name"):
+                logger.warning("No PR label names found.")
                 return []
 
             labels.add(label["name"])
+            logger.debug("PR labels found.")
 
     return list(labels)
 
@@ -120,7 +135,7 @@ def get_repo_var(repo: str, var_name: str) -> list:
         var_name (str): Repo variable name
 
     Returns:
-        str: Comma separated value string.
+        str: csv-string.
     """
     labels = subprocess.run(
         ["gh", "variable", "get", var_name, "--repo", repo],
@@ -129,9 +144,18 @@ def get_repo_var(repo: str, var_name: str) -> list:
         check=True
     )
 
-    return csv_string_to_list(labels.stdout)
+    return labels.stdout
 
 def csv_string_to_list(input: str) -> list:
+    """Covnert string to list.
+
+    Args:
+        input (str): Expected csv string.
+
+    Returns:
+        list: List of strings.
+    """
+
     if input:
         return re.split(r',\s*', input.strip())
 
@@ -143,7 +167,7 @@ def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label
     Args:
         patch_bump_list ([str]): Labels for bumping patch version
         minor_bump_list ([str]): Labels for bumping minor version
-        label_list([str]): Labels found in PRs
+        label_list ([str]): Labels found in PRs
 
     Returns:
         str: version increment
@@ -159,4 +183,56 @@ def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label
     if any(label in pr_label_list for label in patch_bump_list):
         return "patch"
 
+    logger.warning("No relevant labels found for version increment.")
     return ""
+
+# CLI using Click
+
+@click.group()
+def cli():
+    pass
+
+@cli.command()
+@click.argument('repo_name', type=click.STRING)
+@click.argument('query_tags', type=click.STRING)
+@click.argument('latest_release_date', type=click.STRING)
+def pr_labels(latest_release_date, query_tags, repo_name):
+    """Get a list of all version relevant PR labels.
+
+    latest_release_date (str): datatime string\n
+    query_tags (str): csv string\n
+    repo_name (str): repo name as <owner><repo>\n
+    """
+
+    pr_result = query_merged_prs(latest_release_date, query_tags, repo_name)
+    pr_labels = get_labels(pr_data=pr_result)
+
+    if not pr_labels:
+        click.echo("")
+
+    click.echo(pr_labels)
+
+
+@cli.command()
+@click.argument('repo_name', type=click.STRING)
+@click.argument('query_tags', type=click.STRING)
+@click.argument('latest_release_date', type=click.STRING)
+def version_increment(latest_release_date, query_tags, repo_name):
+    """Output a calculated version increment suggestion.
+
+    latest_release_date (str): datatime string\n
+    query_tags (str): csv string\n
+    repo_name (str): repo name as <owner><repo>\n
+    """
+
+    pr_result = query_merged_prs(latest_release_date, query_tags, repo_name)
+    pr_labels = get_labels(pr_data=pr_result)
+    patch_repo_var_list = csv_string_to_list(get_repo_var(repo=repo_name, var_name="PATCH_BUMP_LABEL"))
+    minor_repo_var_list = csv_string_to_list(get_repo_var(repo=repo_name, var_name="MINOR_BUMP_LABEL"))
+    increment = get_version_increment(patch_bump_list=patch_repo_var_list, minor_bump_list=minor_repo_var_list, pr_label_list=pr_labels)
+
+    click.echo(increment)
+
+
+if __name__ == '__main__':
+    cli()
