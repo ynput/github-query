@@ -1,11 +1,21 @@
-name: Test custom action
+name: Unit Testing
 on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+      - 'TODO.md'
+      - '**/*.md'
+      - .gitignore
+      - ./meta/main.yml
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+      - '**/*.md'
+      - .gitignore
   workflow_dispatch:
 env:
   GH_TOKEN: ${{ secrets.CI_TOKEN }}
