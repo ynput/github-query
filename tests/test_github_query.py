@@ -81,6 +81,30 @@ def pr_labels_empty_list():
 def pr_labels_none():
     return None
 
+@pytest.fixture
+def csv_string_spaces():
+    return "bugfix, enhancement, feature"
+
+@pytest.fixture
+def csv_string_no_spaces():
+    return "bugfix,enhancement,feature"
+
+@pytest.fixture
+def csv_string_no_spaces():
+    return "bugfix,enhancement,feature"
+
+@pytest.fixture
+def csv_string_no_comma():
+    return "bugfix"
+
+@pytest.fixture
+def csv_string_no_comma():
+    return "bugfix"
+
+@pytest.fixture
+def csv_string_empty():
+    return ""
+
 
 # Get PR Label test-cases
 
@@ -95,8 +119,29 @@ def test_get_labels_missing_input(pr_api_output_missing_label):
 
     assert labels == []
 
+
 # Convert repo label list
-# TODO implement tests for string to list conversions
+
+def test_csv_string_to_list_spaces(csv_string_spaces):
+    string_list = github_query.csv_string_to_list(csv_string_spaces)
+
+    assert string_list == ["bugfix", "enhancement", "feature"]
+
+def test_csv_string_to_list_no_spaces(csv_string_no_spaces):
+    string_list = github_query.csv_string_to_list(csv_string_no_spaces)
+
+    assert string_list == ["bugfix", "enhancement", "feature"]
+
+def test_csv_string_to_list_no_comma(csv_string_no_comma):
+    string_list = github_query.csv_string_to_list(csv_string_no_comma)
+
+    assert string_list == ["bugfix"]
+
+def test_csv_string_to_list_empty(csv_string_empty):
+    string_list = github_query.csv_string_to_list(csv_string_empty)
+
+    assert string_list == []
+
 
 # Version Increment test-cases
 

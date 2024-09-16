@@ -61,7 +61,7 @@ def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
     return changelog_lines
 
 def changelog_per_label(json_dict):
-    # TODO repalce with labels fetched from tepo variables
+    # TODO replace with labels fetched from repo variables
     changelog_labels = ["bugfix", "enhancement", "feature"]
     labels = []
     for item in json_dict:
@@ -112,7 +112,7 @@ def get_labels(pr_data: dict) -> list:
 
     return list(labels)
 
-def get_repo_var(repo, var_name):
+def get_repo_var(repo: str, var_name: str) -> list:
     """Query labels from repository variables.
 
     Args:
@@ -120,18 +120,22 @@ def get_repo_var(repo, var_name):
         var_name (str): Repo variable name
 
     Returns:
-        [str]: list of found strings in variable
+        str: Comma separated value string.
     """
-    label= subprocess.run(
+    labels = subprocess.run(
         ["gh", "variable", "get", var_name, "--repo", repo],
         capture_output=True,
         text=True,
         check=True
     )
 
-    # TODO enable testing for this conversion
-    return re.split(r',\s*', label.stdout.strip())
+    return csv_string_to_list(labels)
 
+def csv_string_to_list(input: str) -> list:
+    if input:
+        return re.split(r',\s*', input.strip())
+
+    return []
 
 def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label_list: list):
     """Figure out version increment based on PR labels.
