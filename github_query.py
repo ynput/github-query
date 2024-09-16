@@ -129,7 +129,7 @@ def get_repo_var(repo: str, var_name: str) -> list:
         check=True
     )
 
-    return csv_string_to_list(labels)
+    return csv_string_to_list(labels.stdout)
 
 def csv_string_to_list(input: str) -> list:
     if input:
