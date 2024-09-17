@@ -1,7 +1,6 @@
 import pytest
-from unittest.mock import patch
 
-import github_query
+from src import conversion_logic
 
 @pytest.fixture
 def pr_api_output():
@@ -109,13 +108,13 @@ def csv_string_empty():
 # Get PR Label test-cases
 
 def test_get_labels(pr_api_output):
-    labels = github_query.get_labels(pr_data=pr_api_output)
+    labels = conversion_logic.get_labels(pr_data=pr_api_output)
 
     assert isinstance(labels, list)
     assert set(labels) == {"bugfix", "enhancement"}
 
 def test_get_labels_missing_input(pr_api_output_missing_label):
-    labels = github_query.get_labels(pr_data=pr_api_output_missing_label)
+    labels = conversion_logic.get_labels(pr_data=pr_api_output_missing_label)
 
     assert labels == []
 
@@ -123,22 +122,22 @@ def test_get_labels_missing_input(pr_api_output_missing_label):
 # Convert repo label list
 
 def test_csv_string_to_list_spaces(csv_string_spaces):
-    string_list = github_query.csv_string_to_list(csv_string_spaces)
+    string_list = conversion_logic.csv_string_to_list(csv_string_spaces)
 
     assert string_list == ["bugfix", "enhancement", "feature"]
 
 def test_csv_string_to_list_no_spaces(csv_string_no_spaces):
-    string_list = github_query.csv_string_to_list(csv_string_no_spaces)
+    string_list = conversion_logic.csv_string_to_list(csv_string_no_spaces)
 
     assert string_list == ["bugfix", "enhancement", "feature"]
 
 def test_csv_string_to_list_no_comma(csv_string_no_comma):
-    string_list = github_query.csv_string_to_list(csv_string_no_comma)
+    string_list = conversion_logic.csv_string_to_list(csv_string_no_comma)
 
     assert string_list == ["bugfix"]
 
 def test_csv_string_to_list_empty(csv_string_empty):
-    string_list = github_query.csv_string_to_list(csv_string_empty)
+    string_list = conversion_logic.csv_string_to_list(csv_string_empty)
 
     assert string_list == []
 
@@ -146,26 +145,26 @@ def test_csv_string_to_list_empty(csv_string_empty):
 # Version Increment test-cases
 
 def test_get_version_increment_patch(minor_bump, patch_bump, pr_labels_bug):
-    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_bug)
+    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_bug)
 
     assert increment == "patch"
 
 def test_get_version_increment_minor(minor_bump, patch_bump, pr_labels_enhancement):
-    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_enhancement)
+    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_enhancement)
 
     assert increment == "minor"
 
 def test_get_version_increment_wrong_labels(minor_bump, patch_bump, pr_labels_wrong_labels):
-    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_wrong_labels)
+    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_wrong_labels)
 
     assert increment == ""
 
 def test_get_version_increment_none(minor_bump, patch_bump, pr_labels_none):
-    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_none)
+    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_none)
 
     assert increment == ""
 
-def test_get_version_increment_ampty_list(minor_bump, patch_bump, pr_labels_empty_list):
-    increment = github_query.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_empty_list)
+def test_get_version_increment_empty_list(minor_bump, patch_bump, pr_labels_empty_list):
+    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_empty_list)
 
     assert increment == ""
