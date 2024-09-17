@@ -5,9 +5,7 @@ Additonally it's test suite relies mainly on putest and therefore the functions 
 """
 
 import click
-from  src import conversion_logic, queries
-
-# CLI using Click
+from src import conversion_logic, queries
 
 @click.group()
 def cli():
