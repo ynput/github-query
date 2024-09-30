@@ -122,6 +122,10 @@ def get_version_increment(pr_label_list: list, patch_bump_list: list=[], minor_b
         logger.warning("PR label list was empty")
         return ""
 
+    for name, param in locals().items():
+        if not isinstance(param, list):
+            raise ValueError(f"{name} must be a list.")
+
     if any(label in pr_label_list for label in major_bump_list):
         return "major"
 

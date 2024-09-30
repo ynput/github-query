@@ -39,7 +39,7 @@ def pr_labels(latest_release_date, query_tags, repo_name):
 def version_increment(latest_release_date, query_tags, repo_name):
     """Output a calculated version increment suggestion.
 
-    latest_release_date (str): datatime string\n
+    latest_release_date (str): datetime string\n
     query_tags (str): csv string\n
     repo_name (str): repo name as <owner><repo>\n
     """

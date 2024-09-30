@@ -57,6 +57,10 @@ def major_bump():
     return ["epic"]
 
 @pytest.fixture
+def major_bump_no_list():
+    return "epic"
+
+@pytest.fixture
 def minor_bump():
     return ["feature", "enhancement"]
 
@@ -206,3 +210,12 @@ def test_get_version_increment_empty_list(minor_bump, patch_bump, pr_labels_empt
         )
 
     assert increment == ""
+
+def test_get_version_increment_no_list(minor_bump, patch_bump, major_bump_no_list, pr_labels_epic):
+     with pytest.raises(ValueError, match="must be a list"):
+        conversion_logic.get_version_increment(
+            pr_label_list=pr_labels_epic,
+            patch_bump_list=patch_bump,
+            minor_bump_list=minor_bump,
+            major_bump_list=major_bump_no_list,
+            )
