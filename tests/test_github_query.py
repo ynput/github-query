@@ -53,6 +53,10 @@ def pr_api_output_missing_label():
         ]
 
 @pytest.fixture
+def major_bump():
+    return ["epic"]
+
+@pytest.fixture
 def minor_bump():
     return ["feature", "enhancement"]
 
@@ -67,6 +71,10 @@ def pr_labels_bug():
 @pytest.fixture
 def pr_labels_enhancement():
     return ["bugfix", "documentation", "feature", "enhancement"]
+
+@pytest.fixture
+def pr_labels_epic():
+    return ["bugfix", "documentation", "feature", "enhancement", "epic"]
 
 @pytest.fixture
 def pr_labels_wrong_labels():
@@ -145,26 +153,56 @@ def test_csv_string_to_list_empty(csv_string_empty):
 # Version Increment test-cases
 
 def test_get_version_increment_patch(minor_bump, patch_bump, pr_labels_bug):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_bug)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_bug,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == "patch"
 
 def test_get_version_increment_minor(minor_bump, patch_bump, pr_labels_enhancement):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_enhancement)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_enhancement,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == "minor"
 
+def test_get_version_increment_minor(minor_bump, patch_bump, major_bump, pr_labels_epic):
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_epic,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        major_bump_list=major_bump,
+        )
+
+    assert increment == "major"
+
 def test_get_version_increment_wrong_labels(minor_bump, patch_bump, pr_labels_wrong_labels):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_wrong_labels)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_wrong_labels,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == ""
 
 def test_get_version_increment_none(minor_bump, patch_bump, pr_labels_none):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_none)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_none,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == ""
 
 def test_get_version_increment_empty_list(minor_bump, patch_bump, pr_labels_empty_list):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_empty_list)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_empty_list,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == ""

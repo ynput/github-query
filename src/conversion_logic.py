@@ -53,12 +53,12 @@ def prepare_changelog_markdown(pr_query, minor_bump_list, patch_bump_list):
     for pr in pr_query:
         # get all label names in a list
         pr_label_list = [label["name"] for label in pr["labels"]]
-        fitlered_label = list(set(label_list).intersection(pr_label_list))[0]
+        filtered_label = list(set(label_list).intersection(pr_label_list))[0]
 
-        if fitlered_label:
+        if filtered_label:
             change_list = get_changelog(pr_data=pr["body"])
             
-            changelog += f"## {fitlered_label.capitalize()}\n"
+            changelog += f"## {filtered_label.capitalize()}\n"
             changelog += "".join([f"* {change}\n" for change in change_list])
             changelog += "\n"
 
@@ -72,7 +72,7 @@ def get_labels(pr_data: dict) -> list:
         pr_data (dict): Github PR query result
 
     Returns:
-        list: Liste of unique labels strings found or `None`.
+        list: List of unique labels strings found or `None`.
     """
 
     labels = set()
@@ -92,7 +92,7 @@ def get_labels(pr_data: dict) -> list:
     return list(labels)
 
 def csv_string_to_list(input: str) -> list:
-    """Covnert string to list.
+    """Convert string to list.
 
     Args:
         input (str): Expected csv string.
@@ -106,7 +106,7 @@ def csv_string_to_list(input: str) -> list:
 
     return []
 
-def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label_list: list):
+def get_version_increment(pr_label_list: list, patch_bump_list: list=[], minor_bump_list: list=[], major_bump_list: list=[]):
     """Figure out version increment based on PR labels.
 
     Args:
@@ -119,9 +119,12 @@ def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label
     """
 
     if not pr_label_list:
+        logger.warning("PR label list was empty")
         return ""
 
-    # TODO add major bump option
+    if any(label in pr_label_list for label in major_bump_list):
+        return "major"
+
     if any(label in pr_label_list for label in minor_bump_list):
         return "minor"
 
