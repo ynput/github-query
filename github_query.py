@@ -10,6 +10,8 @@ import logging
 import re
 import subprocess
 
+from collections import namedtuple
+
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +62,19 @@ def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
 
     return changelog_lines
 
+def filter_changelog_per_label(pr_data, changelog_label_list):
+    
+    Changelog = namedtuple("Changelog", "labels title number url id")
+    changes_list = []
+
+    for pull_request in pr_data:
+
+        label_list = [label["name"] for label in pull_request["labels"] if label["name"] in changelog_label_list]
+        if label_list:
+            changes_list.append(Changelog(label_list, pull_request["title"], pull_request["number"], pull_request["url"], pull_request["id"]))
+
+    return changes_list
+
 def changelog_per_label(json_dict):
     # TODO replace with labels fetched from repo variables
     changelog_labels = ["bugfix", "enhancement", "feature"]
@@ -69,16 +84,12 @@ def changelog_per_label(json_dict):
         if any(item in changelog_labels for item in labels):
             pass
 
-def prepare_changelog_markdown(pr_query, minor_bump_list, patch_bump_list):   
-    # ? should version bump labels also be filter for changelog ?
-    label_list = minor_bump_list + patch_bump_list
-    changelog = ""
+def build_changelog_markdown(filtered_pr_data, changelog_label_list):
+    changelog = "# Changelog"
 
-    for pr in pr_query:
-        # get all label names in a list
-        pr_label_list = [label["name"] for label in pr["labels"]]
-        fitlered_label = list(set(label_list).intersection(pr_label_list))[0]
-
+    for pr_data in filtered_pr_data:
+        
+        pr_data.labels in pr_data
         if fitlered_label:
             change_list = get_changelog(pr_data=pr["body"])
             
@@ -160,3 +171,16 @@ def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label
         return "patch"
 
     return ""
+
+if __name__ == '__main__':
+
+    # TODO remove before merging
+    command = f"gh pr list --state merged --search 'merged:>=2024-08-01T11:29:22Z' --json body,labels,title,number,url,id --repo ynput/ayon-maya"
+    pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    pr_data = json.loads(pr_json.stdout)
+
+    changelog_labels = ["type: bug", "type: enhancement", "type: maintenance"]
+    pr_filtered = filter_changelog_per_label(pr_data=pr_data, changelog_label_list=changelog_labels):
+    changelog = build_changelog_markdown(filtered_pr_data=pr_filtered, changelog_label_list=changelog_labels)
+
+    print(changelog)
