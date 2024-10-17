@@ -11,6 +11,7 @@ import re
 import subprocess
 
 from collections import namedtuple
+from itertools import groupby
 
 
 logger = logging.getLogger(__name__)
@@ -62,40 +63,45 @@ def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
 
     return changelog_lines
 
-def filter_changelog_per_label(pr_data, changelog_label_list):
+def filter_changes_per_label(pr_data: dict, changelog_label_list: list) -> namedtuple:
     
     Changelog = namedtuple("Changelog", "labels title number url id")
     changes_list = []
 
     for pull_request in pr_data:
 
+        # TODO refactor this to become more readable
         label_list = [label["name"] for label in pull_request["labels"] if label["name"] in changelog_label_list]
         if label_list:
             changes_list.append(Changelog(label_list, pull_request["title"], pull_request["number"], pull_request["url"], pull_request["id"]))
 
     return changes_list
 
-def changelog_per_label(json_dict):
-    # TODO replace with labels fetched from repo variables
-    changelog_labels = ["bugfix", "enhancement", "feature"]
-    labels = []
-    for item in json_dict:
-        labels.append(item["labels"])
-        if any(item in changelog_labels for item in labels):
-            pass
+def sort_changes(changes_list: namedtuple, changelog_label_list: list) -> namedtuple:
 
-def build_changelog_markdown(filtered_pr_data, changelog_label_list):
+    # TODO implement this logic in a more clever way
+    sorted_changes = []
+    for order_label in changelog_label_list:
+        for change in changes_list:
+            if any(label == order_label for label in change.labels):
+                sorted_changes.append(change)
+
+    return sorted_changes
+
+def build_changelog_markdown(changes):
     changelog = "# Changelog"
+    previous_labels = []
 
-    for pr_data in filtered_pr_data:
+    # TODO implement this logic in a more clever way, checkout `from itertools import groupby`
+    for change in changes:
+        current_labels = change.labels
         
-        pr_data.labels in pr_data
-        if fitlered_label:
-            change_list = get_changelog(pr_data=pr["body"])
-            
-            changelog += f"## {fitlered_label.capitalize()}\n"
-            changelog += "".join([f"* {change}\n" for change in change_list])
-            changelog += "\n"
+        if not any(label in previous_labels for label in current_labels):
+            changelog += f"\n\n## {change.labels[0]}\n\n"
+
+        changelog += f"* {change.title} - [{change.number}]({change.url})\n"
+
+        previous_labels = current_labels
 
     return changelog
 
@@ -180,7 +186,7 @@ if __name__ == '__main__':
     pr_data = json.loads(pr_json.stdout)
 
     changelog_labels = ["type: bug", "type: enhancement", "type: maintenance"]
-    pr_filtered = filter_changelog_per_label(pr_data=pr_data, changelog_label_list=changelog_labels):
-    changelog = build_changelog_markdown(filtered_pr_data=pr_filtered, changelog_label_list=changelog_labels)
-
-    print(changelog)
+    pr_filtered = filter_changes_per_label(pr_data=pr_data, changelog_label_list=changelog_labels)
+    sorted_changes = sort_changes(changes_list=pr_filtered, changelog_label_list=changelog_labels)
+    markdown_changelog = build_changelog_markdown(sorted_changes)
+    print(markdown_changelog)
