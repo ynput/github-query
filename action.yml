@@ -30,9 +30,9 @@ outputs:
   bump-increment:
     description: Increment for version bumping - either `patch` or 'minor'
     value: ${{ steps.bump-increment.outputs.increment }}
-  # changelog-markdown:
-  #   description: String containing full makrdown syntax for release changelog information
-  #   value: ${{ steps.write-changelog.outputs.changelog }}
+  changelog-markdown:
+    description: String containing full markdown syntax for release changelog information
+    value: ${{ steps.write-changelog.outputs.changelog }}
 
 runs:
   using: composite
