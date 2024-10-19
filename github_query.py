@@ -4,6 +4,7 @@ It's supposed to be run from command line right away to be used in a github acti
 Additionally it's test suite relies mainly on pytest and therefore the functions need to be importable to the pytest script.
 """
 
+import click
 import json
 import logging
 import re
@@ -15,7 +16,6 @@ from collections import namedtuple
 logger = logging.getLogger(__name__)
 
 Changelog = namedtuple("Changelog", "labels title number url id")
-
 
 
 # def parse_args() -> dict:
@@ -187,19 +187,23 @@ def get_version_increment(patch_bump_list: list[str], minor_bump_list: list[str]
     return ""
 
 
+@click.group()
+def cli():
+    pass
+
+
+@cli.command()
 def generate_release_changelog() -> str:
     command: str = f"gh pr list --state merged --search 'merged:>=2024-08-01T11:29:22Z' --json body,labels,title,number,url,id --repo ynput/ayon-maya"    
     pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    pr_data: str = json.loads(pr_json.stdout)
+    pr_data: list[dict[str, str]] = json.loads(pr_json.stdout)
     changelog_labels: list[str] = ["type: bug", "type: enhancement", "type: maintenance"]
 
-    pr_filtered: Changelog = filter_changes_per_label(pr_data=pr_data, changelog_label_list=changelog_labels)
+    pr_filtered: list[Changelog] = filter_changes_per_label(pr_data=pr_data, changelog_label_list=changelog_labels)
     sorted_changes: list[Changelog] = sort_changes(changes_list=pr_filtered, changelog_label_list=changelog_labels)
     markdown_changelog: str = build_changelog_markdown(sorted_changes)
-
-    print(markdown_changelog)
 
     return markdown_changelog
 
 if __name__ == "__main__":
-    generate_release_changelog()
+    cli()
