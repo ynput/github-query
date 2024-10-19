@@ -78,9 +78,11 @@ runs:
         cd $GITHUB_ACTION_PATH
         changelog=$(python github_query.py generate-release-changelog)
         delimiter="$(openssl rand -hex 8)"
-        echo "changelog<<${delimiter}" >> "${GITHUB_OUTPUT}"
-        echo $changelog >> "${GITHUB_OUTPUT}"
-        echo "${delimiter}" >> "${GITHUB_OUTPUT}"
+        {
+          echo "changelog<<${delimiter}"
+          echo $changelog
+          echo "${delimiter}"
+        } >> $GITHUB_OUTPUT
 
     - name: Show changelog formatted
       shell: bash
