@@ -84,7 +84,7 @@ runs:
         delimiter="$(openssl rand -hex 8)"
         {
           echo "changelog<<${delimiter}"
-          echo $changelog
+          printf "%s" "$changelog"
           echo "${delimiter}"
         } >> $GITHUB_OUTPUT
 
