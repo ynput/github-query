@@ -44,7 +44,7 @@ jobs:
     steps:
         - name: Run action
           id: test-action
-          uses: ynput/github-query@main
+          uses: ynput/github-query@generate-changelog
           with:
             repo: "ynput/ayon-addon-action-testing"
             date: "2024-08-20T12:03:23Z"
