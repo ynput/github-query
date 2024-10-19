@@ -21,15 +21,15 @@ inputs:
     required: true
 
 outputs:
-  raw-output:
-    description: Full output json dictionary from github api.
-    value: ${{ steps.raw-output.outputs.raw_output }}
-  label-list:
-    description: List of unique labels found in PRs.
-    value: ${{ steps.get-labels-list.outputs.label_list }}
-  bump-increment:
-    description: Increment for version bumping - either `patch` or 'minor'
-    value: ${{ steps.bump-increment.outputs.increment }}
+  # raw-output:
+  #   description: Full output json dictionary from github api.
+  #   value: ${{ steps.raw-output.outputs.raw_output }}
+  # label-list:
+  #   description: List of unique labels found in PRs.
+  #   value: ${{ steps.get-labels-list.outputs.label_list }}
+  # bump-increment:
+  #   description: Increment for version bumping - either `patch` or 'minor'
+  #   value: ${{ steps.bump-increment.outputs.increment }}
   changelog-markdown:
     description: String containing full markdown syntax for release changelog information
     value: ${{ steps.write-changelog.outputs.changelog }}
@@ -38,38 +38,38 @@ runs:
   using: composite
 
   steps:
-    - name: Get raw GitHub output
-      id: raw-output
-      shell: bash
-      run: |
-        raw_output=$(gh pr list --state merged --search 'merged:>=${{ inputs.date }}' --json ${{ inputs.query_parameters }} --repo ${{ inputs.repo }})
-        if [[ "$raw_output" == '[]' ]]; then
-          echo "raw_output=''" >> $GITHUB_OUTPUT
-          exit 0
-        fi
+    # - name: Get raw GitHub output
+    #   id: raw-output
+    #   shell: bash
+    #   run: |
+    #     raw_output=$(gh pr list --state merged --search 'merged:>=${{ inputs.date }}' --json ${{ inputs.query_parameters }} --repo ${{ inputs.repo }})
+    #     if [[ "$raw_output" == '[]' ]]; then
+    #       echo "raw_output=''" >> $GITHUB_OUTPUT
+    #       exit 0
+    #     fi
 
-        echo "raw_output=$raw_output" >> $GITHUB_OUTPUT
+    #     echo "raw_output=$raw_output" >> $GITHUB_OUTPUT
 
-    - name: Get label list
-      id: get-labels-list
-      shell: bash
-      run: |
-        cd $GITHUB_ACTION_PATH
-        label_list=$(python -c 'import github_query; print(github_query.get_labels(github_query.parse_args()))'  "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
-        if [[ "$label_list" == '[]' ]]; then
-          echo "label_list=''" >> $GITHUB_OUTPUT
-          exit 0
-        fi
+    # - name: Get label list
+    #   id: get-labels-list
+    #   shell: bash
+    #   run: |
+    #     cd $GITHUB_ACTION_PATH
+    #     label_list=$(python -c 'import github_query; print(github_query.get_labels(github_query.parse_args()))'  "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+    #     if [[ "$label_list" == '[]' ]]; then
+    #       echo "label_list=''" >> $GITHUB_OUTPUT
+    #       exit 0
+    #     fi
 
-        echo "label_list=$label_list" >> $GITHUB_OUTPUT
+    #     echo "label_list=$label_list" >> $GITHUB_OUTPUT
 
-    - name: Get version increment
-      id: bump-increment
-      shell: bash
-      run: |
-        cd $GITHUB_ACTION_PATH
-        increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_var, minor_bump_list=minor_repo_var, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
-        echo "increment=$increment" >> $GITHUB_OUTPUT
+    # - name: Get version increment
+    #   id: bump-increment
+    #   shell: bash
+    #   run: |
+    #     cd $GITHUB_ACTION_PATH
+    #     increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_var, minor_bump_list=minor_repo_var, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+    #     echo "increment=$increment" >> $GITHUB_OUTPUT
 
     - name: Prepare Changelog 
       id: write-changelog
