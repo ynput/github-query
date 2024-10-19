@@ -88,11 +88,4 @@ runs:
           echo "${delimiter}"
         } >> $GITHUB_OUTPUT
 
-    - name: Show changelog formatted
-      shell: bash
-      run: |
-        echo -e "${{ steps.write-changelog.outputs.changelog }}"
-        echo ""
-        printf "%s\n" "${{ steps.write-changelog.outputs.changelog }}"
-
 ...
