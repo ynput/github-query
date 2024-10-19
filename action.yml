@@ -84,13 +84,15 @@ runs:
         delimiter="$(openssl rand -hex 8)"
         {
           echo "changelog<<${delimiter}"
-          printf "%s" "$changelog"
+          echo $changelog
           echo "${delimiter}"
         } >> $GITHUB_OUTPUT
 
     - name: Show changelog formatted
       shell: bash
       run: |
-        echo "${{ steps.write-changelog.outputs.changelog }}"
+        echo -e "${{ steps.write-changelog.outputs.changelog }}"
+        echo ""
+        printf "%s\n" "${{ steps.write-changelog.outputs.changelog }}"
 
 ...
