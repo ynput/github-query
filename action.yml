@@ -79,4 +79,9 @@ runs:
         changelog=$(python github_query.py generate-release-changelog)
         echo "changelog=$changelog" >> $GITHUB_OUTPUT
 
+    - name: Show changelog formatted
+      shell: bash
+      run: |
+        echo "${{ steps.write-changelog.outputs.changelog }}"
+
 ...
