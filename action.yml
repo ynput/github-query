@@ -71,6 +71,10 @@ runs:
     #     increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_var, minor_bump_list=minor_repo_var, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
     #     echo "increment=$increment" >> $GITHUB_OUTPUT
 
+    # INFO multiline strings need to be precessed like this according to 
+    # INFO https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#multiline-strings
+    # INFO and
+    # INFO https://stackoverflow.com/questions/74137120/how-to-fix-or-avoid-error-unable-to-process-file-command-output-successfully/74232400#74232400
     - name: Prepare Changelog 
       id: write-changelog
       shell: bash
