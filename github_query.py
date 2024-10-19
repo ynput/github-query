@@ -18,23 +18,23 @@ logger = logging.getLogger(__name__)
 Changelog = namedtuple("Changelog", "labels title number url id")
 
 
-# def parse_args() -> dict:
-#     """Parse command-line arguments and store them in a global variable."""
+def parse_args() -> dict:
+    """Parse command-line arguments and store them in a global variable."""
 
-#     parser = argparse.ArgumentParser(description="A python script to convert GitHub PR information to a more simple format.")
-#     parser.add_argument("repo", type=str, help="Repository name consisting of 'repo-owner/repo-name'")
-#     parser.add_argument("query_parameters", type=str, help="Keys to query for.")
-#     parser.add_argument("date", type=str, default="2024-07-08T09:48:33Z", help="Latest release date.")
-#     parsed_args = parser.parse_args()
+    parser = argparse.ArgumentParser(description="A python script to convert GitHub PR information to a more simple format.")
+    parser.add_argument("repo", type=str, help="Repository name consisting of 'repo-owner/repo-name'")
+    parser.add_argument("query_parameters", type=str, help="Keys to query for.")
+    parser.add_argument("date", type=str, default="2024-07-08T09:48:33Z", help="Latest release date.")
+    parsed_args = parser.parse_args()
 
-#     repo_name = parsed_args.repo
-#     query_tags = parsed_args.query_parameters.split(',')
-#     latest_release_date = parsed_args.date
+    repo_name = parsed_args.repo
+    query_tags = parsed_args.query_parameters.split(',')
+    latest_release_date = parsed_args.date
 
-#     command = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo_name}"
-#     pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    command = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo_name}"
+    pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-#     return json.loads(pr_json.stdout)
+    return json.loads(pr_json.stdout)
 
 
 def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
@@ -203,7 +203,7 @@ def generate_release_changelog() -> str:
     sorted_changes: list[Changelog] = sort_changes(changes_list=pr_filtered, changelog_label_list=changelog_labels)
     markdown_changelog: str = build_changelog_markdown(sorted_changes)
 
-    return markdown_changelog
+    click.echo(markdown_changelog)
 
 if __name__ == "__main__":
     cli()
