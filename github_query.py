@@ -4,6 +4,7 @@ It's supposed to be run from command line right away to be used in a github acti
 Additionally it's test suite relies mainly on pytest and therefore the functions need to be importable to the pytest script.
 """
 
+import argparse
 import click
 import json
 import logging
@@ -31,7 +32,7 @@ def parse_args() -> dict:
     query_tags = parsed_args.query_parameters.split(',')
     latest_release_date = parsed_args.date
 
-    command = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo_name}"
+    command: str = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo_name}"
     pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     return json.loads(pr_json.stdout)
