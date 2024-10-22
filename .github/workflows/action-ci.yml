@@ -61,5 +61,5 @@ jobs:
         - name: Show changelog formatted
           shell: bash
           run: |
-            changelog="${{ steps.test-action.outputs.changelog-markdown }}"
+            changelog=${{ steps.test-action.outputs.changelog-markdown }}
             echo "$changelog"
