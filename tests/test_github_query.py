@@ -179,9 +179,9 @@ def test_get_version_increment_empty_list(minor_bump, patch_bump, pr_labels_empt
 
 # Changelog test-cases
 
-def test_changer_pert_label(merged_pr_samples):
+def test_changer_pert_label(merged_pr_samples: dict[str, str]) -> None:
     changelog_labels: list[str] = ["type: bug", "type: enhancement", "type: maintenance"]
-    filtered_results = github_query.filter_changes_per_label(pr_data=merged_pr_samples, changelog_label_list=changelog_labels)
+    filtered_results: list[Changelog] = github_query.filter_changes_per_label(pr_data=merged_pr_samples, changelog_label_list=changelog_labels)
 
     for result in filtered_results:
         for label in result.labels:

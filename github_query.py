@@ -13,10 +13,12 @@ import subprocess
 
 from collections import namedtuple
 
+from src import conversion_logic, queries
 
-logger = logging.getLogger(__name__)
 
-Changelog = namedtuple("Changelog", "labels title number url id")
+logger: logging.Logger = logging.getLogger(__name__)
+
+Changelog: type[Changelog] = namedtuple("Changelog", "labels title number url id")
 
 
 def parse_args() -> dict:
@@ -194,13 +196,22 @@ def cli():
 
 
 @cli.command()
-def generate_release_changelog() -> str:
-    command: str = f"gh pr list --state merged --search 'merged:>=2024-08-01T11:29:22Z' --json body,labels,title,number,url,id --repo ynput/ayon-maya"    
-    pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    pr_data: list[dict[str, str]] = json.loads(pr_json.stdout)
-    changelog_labels: list[str] = ["type: bug", "type: enhancement", "type: maintenance"]
+@click.argument('repo_name', type=click.STRING)
+@click.argument('query_tags', type=click.STRING)
+@click.argument('latest_release_date', type=click.STRING)
+@click.argument('changelog_labels', type=click.STRING)
+def generate_release_changelog(latest_release_date: str, query_tags: str, repo_name: str, changelog_labels: str) -> None:
+    """Output a markdown formatted changelog.
 
-    pr_filtered: list[Changelog] = filter_changes_per_label(pr_data=pr_data, changelog_label_list=changelog_labels)
+    latest_release_date (str): datetime string\n
+    query_tags (str): csv string\n
+    repo_name (str): repo name as <owner><repo>\n
+    """
+
+    pr_result: list[dict[str, str]] = queries.query_merged_prs(latest_release_date, query_tags, repo_name)
+    changelog_markdown_result: list[str] = conversion_logic.csv_string_to_list(queries.get_repo_var(repo=repo_name, var_name=changelog_labels))
+
+    pr_filtered: list[Changelog] = filter_changes_per_label(pr_data=pr_result, changelog_label_list=changelog_markdown_result)
     sorted_changes: list[Changelog] = sort_changes(changes_list=pr_filtered, changelog_label_list=changelog_labels)
     markdown_changelog: str = build_changelog_markdown(sorted_changes)
 

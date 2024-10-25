@@ -19,6 +19,9 @@ inputs:
   query_parameters:
     description: Parameters to query for in pr Information
     required: true
+  changelog_labels:
+    description: CSV string of labels for changelog order
+    required: false
 
 outputs:
   raw-output:
@@ -75,12 +78,13 @@ runs:
     # INFO https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#multiline-strings
     # INFO and
     # INFO https://stackoverflow.com/questions/74137120/how-to-fix-or-avoid-error-unable-to-process-file-command-output-successfully/74232400#74232400
-    - name: Prepare Changelog 
+    - name: Prepare Changelog
+      if: changelog_labels
       id: write-changelog
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        changelog=$(python github_query.py generate-release-changelog)
+        changelog=$(python github_query.py generate-release-changelog "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}" "{{ inputs.changelog_labels }}"))
         delimiter="$(openssl rand -hex 8)"
         {
           echo "changelog<<${delimiter}"
