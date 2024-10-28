@@ -208,7 +208,8 @@ def generate_release_changelog(latest_release_date: str, query_tags: str, repo_n
     repo_name (str): repo name as <owner><repo>\n
     """
 
-    pr_result: list[dict[str, str]] = queries.query_merged_prs(latest_release_date, query_tags, repo_name)
+    query_tags_list: list[str] = conversion_logic.csv_string_to_list(query_tags)
+    pr_result: list[dict[str, str]] = queries.query_merged_prs(latest_release_date, query_tags_list, repo_name)
     changelog_markdown_result: list[str] = conversion_logic.csv_string_to_list(queries.get_repo_var(repo=repo_name, var_name=changelog_labels))
 
     pr_filtered: list[Changelog] = filter_changes_per_label(pr_data=pr_result, changelog_label_list=changelog_markdown_result)

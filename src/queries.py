@@ -2,7 +2,7 @@ import json
 import subprocess
 
 
-def query_merged_prs(latest_release_date: str, query_tags: str, repo_name: str) -> list[dict[str, str]]:
+def query_merged_prs(latest_release_date: str, query_tags: list[str], repo_name: str) -> list[dict[str, str]]:
     """Run gh pull request query.
 
     Args:
