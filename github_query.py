@@ -88,6 +88,10 @@ def sort_changes(changes_list: list[Changelog], changelog_label_list: list[str])
 
     # TODO implement this logic in a more clever way
     sorted_changes: list[Changelog] = []
+
+    print(changes_list)
+    print(changelog_label_list)
+
     for order_label in changelog_label_list:
         for change in changes_list:
             if any(label == order_label for label in change.labels):
@@ -210,9 +214,9 @@ def generate_release_changelog(latest_release_date: str, query_tags: str, repo_n
 
     query_tags_list: list[str] = conversion_logic.csv_string_to_list(query_tags)
     pr_result: list[dict[str, str]] = queries.query_merged_prs(latest_release_date, query_tags_list, repo_name)
-    changelog_markdown_result: list[str] = conversion_logic.csv_string_to_list(changelog_labels)
+    changelog_labels_result: list[str] = conversion_logic.csv_string_to_list(changelog_labels)
 
-    pr_filtered: list[Changelog] = filter_changes_per_label(pr_data=pr_result, changelog_label_list=changelog_markdown_result)
+    pr_filtered: list[Changelog] = filter_changes_per_label(pr_data=pr_result, changelog_label_list=changelog_labels_result)
     sorted_changes: list[Changelog] = sort_changes(changes_list=pr_filtered, changelog_label_list=changelog_labels)
     markdown_changelog: str = build_changelog_markdown(sorted_changes)
 
