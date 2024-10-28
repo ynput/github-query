@@ -48,7 +48,7 @@ jobs:
           with:
             repo: "ynput/ayon-addon-action-testing"
             date: "2024-08-20T12:03:23Z"
-            query_parameters: "body,labels,title"
+            query_parameters: "body,labels,title,number,url,id"
             changelog_labels: "feature,enhancement,bugfix,refactor,docs,test,pr"
 
         - name: Show results
