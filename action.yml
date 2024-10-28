@@ -84,7 +84,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        changelog=$(python github_query.py generate-release-changelog "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}" "{{ inputs.changelog_labels }}")
+        changelog=$(python github_query.py generate-release-changelog "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}" "${{ inputs.changelog_labels }}")
         delimiter="$(openssl rand -hex 8)"
         {
           echo "changelog<<${delimiter}"
