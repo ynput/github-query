@@ -89,9 +89,6 @@ def sort_changes(changes_list: list[Changelog], changelog_label_list: list[str])
     # TODO implement this logic in a more clever way
     sorted_changes: list[Changelog] = []
 
-    print(changes_list)
-    print(changelog_label_list)
-
     for order_label in changelog_label_list:
         for change in changes_list:
             if any(label == order_label for label in change.labels):
