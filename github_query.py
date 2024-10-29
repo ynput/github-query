@@ -106,7 +106,8 @@ def build_changelog_markdown(changes: list[Changelog]) -> str:
         current_labels: list[str] = change.labels
         
         if not any(label in previous_labels for label in current_labels):
-            changelog += f"\n\n## {change.labels[0]}\n\n"
+            label: str = change.labels[0].removeprefix("type: ")
+            changelog += f"\n\n## {label.capitalize()}\n\n"
 
         changelog += f"* {change.title} - [{change.number}]({change.url})\n"
 
