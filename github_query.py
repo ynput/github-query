@@ -23,8 +23,9 @@ def pr_labels(latest_release_date, query_tags, repo_name):
     query_tags (str): csv string\n
     repo_name (str): repo name as <owner><repo>\n
     """
-
-    pr_result = queries.query_merged_prs(latest_release_date, query_tags, repo_name)
+    
+    query_tags_list: list[str] = conversion_logic.csv_string_to_list(query_tags)
+    pr_result = queries.query_merged_prs(latest_release_date, query_tags_list, repo_name)
     pr_labels = conversion_logic.get_labels(pr_data=pr_result)
 
     if not pr_labels:
