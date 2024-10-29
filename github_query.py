@@ -26,7 +26,7 @@ def pr_labels(latest_release_date, query_tags, repo_name):
     
     query_tags_list: list[str] = conversion_logic.csv_string_to_list(query_tags)
     pr_result = queries.query_merged_prs(latest_release_date, query_tags_list, repo_name)
-    pr_labels = conversion_logic.get_labels(pr_data=pr_result)
+    pr_labels = conversion_logic.filter_unique_labels(pr_data=pr_result)
 
     if not pr_labels:
         click.echo("")
@@ -47,7 +47,7 @@ def version_increment(latest_release_date, query_tags, repo_name):
     """
 
     pr_result = queries.query_merged_prs(latest_release_date, query_tags, repo_name)
-    pr_labels = conversion_logic.get_labels(pr_data=pr_result)
+    pr_labels = conversion_logic.filter_unique_labels(pr_data=pr_result)
     patch_repo_var_list = conversion_logic.csv_string_to_list(queries.get_repo_var(repo=repo_name, var_name="PATCH_BUMP_LABEL"))
     minor_repo_var_list = conversion_logic.csv_string_to_list(queries.get_repo_var(repo=repo_name, var_name="MINOR_BUMP_LABEL"))
     increment = conversion_logic.get_version_increment(patch_bump_list=patch_repo_var_list, minor_bump_list=minor_repo_var_list, pr_label_list=pr_labels)
