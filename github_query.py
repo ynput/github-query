@@ -1,6 +1,5 @@
 """
-This script is written in a certain - maybe even unconventional way - by intention.
-It's supposed to be run from command line right away to be used in a github action workflow yaml file.
+This script is supposed to be run from command line right away to be used in a github action workflow yaml file.
 Additionally it's test suite relies mainly on pytest and therefore the functions need to be importable to the pytest script.
 """
 
