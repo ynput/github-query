@@ -38,7 +38,7 @@ def pr_labels(latest_release_date, query_tags, repo_name):
 @click.argument('repo_name', type=click.STRING)
 @click.argument('query_tags', type=click.STRING)
 @click.argument('latest_release_date', type=click.STRING)
-def version_increment(latest_release_date, query_tags, repo_name):
+def version_increment(latest_release_date: str, query_tags: str, repo_name: str):
     """Output a calculated version increment suggestion.
 
     latest_release_date (str): datetime string\n
@@ -46,7 +46,8 @@ def version_increment(latest_release_date, query_tags, repo_name):
     repo_name (str): repo name as <owner><repo>\n
     """
 
-    pr_result = queries.query_merged_prs(latest_release_date, query_tags, repo_name)
+    query_tags_list: list[str] = conversion_logic.csv_string_to_list(query_tags)
+    pr_result = queries.query_merged_prs(latest_release_date, query_tags_list, repo_name)
     pr_labels = conversion_logic.filter_unique_labels(pr_data=pr_result)
     patch_repo_var_list = conversion_logic.csv_string_to_list(queries.get_repo_var(repo=repo_name, var_name="PATCH_BUMP_LABEL"))
     minor_repo_var_list = conversion_logic.csv_string_to_list(queries.get_repo_var(repo=repo_name, var_name="MINOR_BUMP_LABEL"))
