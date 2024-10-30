@@ -2,7 +2,7 @@ from typing import Any, Literal
 import json
 import pytest
 
-from src import conversion_logic, queries
+from src import conversion_logic
 
 @pytest.fixture
 def pr_api_output() -> list[dict[str, Any]]:
@@ -55,6 +55,14 @@ def pr_api_output_missing_label():
         ]
 
 @pytest.fixture
+def major_bump():
+    return ["epic"]
+
+@pytest.fixture
+def major_bump_no_list():
+    return "epic"
+
+@pytest.fixture
 def merged_pr_samples():
     with open("merged_pr_query.json") as file:
         return json.load(file)
@@ -74,6 +82,14 @@ def pr_labels_bug() -> list[str]:
 @pytest.fixture
 def pr_labels_enhancement() -> list[str]:
     return ["bugfix", "documentation", "feature", "enhancement"]
+
+@pytest.fixture
+def pr_labels_epic():
+    return ["bugfix", "documentation", "feature", "enhancement", "epic"]
+
+@pytest.fixture
+def pr_labels_epic():
+    return ["bugfix", "documentation", "feature", "enhancement", "epic"]
 
 @pytest.fixture
 def pr_labels_wrong_labels() -> list[str]:
@@ -130,20 +146,24 @@ def test_get_labels_missing_input(pr_api_output_missing_label):
 
 def test_csv_string_to_list_spaces(csv_string_spaces):
     string_list = conversion_logic.csv_string_to_list(csv_string_spaces)
+    string_list = conversion_logic.csv_string_to_list(csv_string_spaces)
 
     assert string_list == ["bugfix", "enhancement", "feature"]
 
 def test_csv_string_to_list_no_spaces(csv_string_no_spaces):
+    string_list = conversion_logic.csv_string_to_list(csv_string_no_spaces)
     string_list = conversion_logic.csv_string_to_list(csv_string_no_spaces)
 
     assert string_list == ["bugfix", "enhancement", "feature"]
 
 def test_csv_string_to_list_no_comma(csv_string_no_comma):
     string_list = conversion_logic.csv_string_to_list(csv_string_no_comma)
+    string_list = conversion_logic.csv_string_to_list(csv_string_no_comma)
 
     assert string_list == ["bugfix"]
 
 def test_csv_string_to_list_empty(csv_string_empty):
+    string_list = conversion_logic.csv_string_to_list(csv_string_empty)
     string_list = conversion_logic.csv_string_to_list(csv_string_empty)
 
     assert string_list == []
@@ -152,29 +172,77 @@ def test_csv_string_to_list_empty(csv_string_empty):
 # Version Increment test-cases
 
 def test_get_version_increment_patch(minor_bump, patch_bump, pr_labels_bug):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_bug)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_bug,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == "patch"
 
 def test_get_version_increment_minor(minor_bump, patch_bump, pr_labels_enhancement):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_enhancement)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_enhancement,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == "minor"
 
+def test_get_version_increment_minor(minor_bump, patch_bump, major_bump, pr_labels_epic):
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_epic,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        major_bump_list=major_bump,
+        )
+
+    assert increment == "major"
+
 def test_get_version_increment_wrong_labels(minor_bump, patch_bump, pr_labels_wrong_labels):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_wrong_labels)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_wrong_labels,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == ""
 
 def test_get_version_increment_none(minor_bump, patch_bump, pr_labels_none):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_none)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_none,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == ""
 
 def test_get_version_increment_empty_list(minor_bump, patch_bump, pr_labels_empty_list):
-    increment = conversion_logic.get_version_increment(patch_bump_list=patch_bump, minor_bump_list=minor_bump, pr_label_list=pr_labels_empty_list)
+    increment = conversion_logic.get_version_increment(
+        pr_label_list=pr_labels_empty_list,
+        patch_bump_list=patch_bump,
+        minor_bump_list=minor_bump,
+        )
 
     assert increment == ""
+
+def test_get_version_increment_no_list(minor_bump, patch_bump, major_bump_no_list, pr_labels_epic):
+     with pytest.raises(ValueError, match="must be a list"):
+        conversion_logic.get_version_increment(
+            pr_label_list=pr_labels_epic,
+            patch_bump_list=patch_bump,
+            minor_bump_list=minor_bump,
+            major_bump_list=major_bump_no_list,
+            )
+
+def test_get_version_increment_no_list(minor_bump, patch_bump, major_bump_no_list, pr_labels_epic):
+     with pytest.raises(ValueError, match="must be a list"):
+        conversion_logic.get_version_increment(
+            pr_label_list=pr_labels_epic,
+            patch_bump_list=patch_bump,
+            minor_bump_list=minor_bump,
+            major_bump_list=major_bump_no_list,
+            )
 
 
 # Changelog test-cases
