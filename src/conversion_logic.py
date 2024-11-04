@@ -40,37 +40,6 @@ def filter_changes_per_label(pr_data: list[dict[str, str]], changelog_label_list
     return changes_list
 
 
-# INFO currently not in use
-def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
-    """Get list of changes from a PRs changelog.
-
-    Args:
-        pr_body (list(str)): List of PR body contents.
-        changelog_start (str, optional): Indicates markdown changelog section. Defaults to "## Changes".
-        heading (str, optional): Markdown heading. Defaults to "##".
-
-    Returns:
-        list(str): List of changes found.
-    """
-
-    lines: list[str] = pr_data.splitlines()
-    changelog_section = None
-    changelog_lines: list[str] = []
-
-    for line in lines:
-        if line.startswith(changelog_start):
-            changelog_section = True
-            continue
-
-        if changelog_section and line.startswith(heading):
-            break
-
-        if changelog_section and line.startswith("* "):
-            changelog_lines.append(line.strip("* ").strip())
-
-    return changelog_lines
-
-
 def format_changelog_markdown(changes: list[Changelog], changelog_label_list: list[str]) -> str:
     """Create markdown formatted changelog.
 
