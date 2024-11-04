@@ -1,20 +1,20 @@
 import logging
 import re
 
-from typing import NamedTuple
+from typing import NamedTuple, List
 
 logger: logging.Logger = logging.getLogger(__name__)
 
 
 class Changelog(NamedTuple):
-    labels: list[str]
+    labels: List[str]
     title: str
     number: int
     url: str
     id: int
 
 
-def filter_changes_per_label(pr_data: list[dict[str, str]], changelog_label_list: list[str]) -> list[Changelog]:
+def filter_changes_per_label(pr_data: List[dict[str, str]], changelog_label_list: List[str]) -> List[Changelog]:
     """Convert list of PR dictionaries to Changelog list
 
     Args:
@@ -25,7 +25,7 @@ def filter_changes_per_label(pr_data: list[dict[str, str]], changelog_label_list
         list[Changelog]: List of changelog objects
     """
 
-    changes_list: list[Changelog] = []
+    changes_list: List[Changelog] = []
 
     for pull_request in pr_data:
         if pull_request.get("labels"):
@@ -40,7 +40,7 @@ def filter_changes_per_label(pr_data: list[dict[str, str]], changelog_label_list
     return changes_list
 
 
-def format_changelog_markdown(changes: list[Changelog], changelog_label_list: list[str]) -> str:
+def format_changelog_markdown(changes: List[Changelog], changelog_label_list: List[str]) -> str:
     """Create markdown formatted changelog.
 
     Args:
@@ -64,7 +64,7 @@ def format_changelog_markdown(changes: list[Changelog], changelog_label_list: li
     return changelog
 
 
-def filter_unique_labels(pr_data: dict[dict[str, str]]) -> list[str]:
+def filter_unique_labels(pr_data: List[dict[str, str]]) -> List[str]:
     """Filter all unique labels from dictionary.
 
     Args:
@@ -91,7 +91,7 @@ def filter_unique_labels(pr_data: dict[dict[str, str]]) -> list[str]:
     return list(labels)
 
 
-def csv_string_to_list(input: str) -> list[str]:
+def csv_string_to_list(input: str) -> List[str]:
     """Convert string to list.
 
     Args:
@@ -107,7 +107,7 @@ def csv_string_to_list(input: str) -> list[str]:
     return []
 
 
-def get_version_increment(pr_label_list: list[str], patch_bump_list: list[str]=[], minor_bump_list: list[str]=[], major_bump_list: list[str]=[]):
+def get_version_increment(pr_label_list: List[str], patch_bump_list: List[str]=[], minor_bump_list: List[str]=[], major_bump_list: List[str]=[]):
     """Figure out version increment based on PR labels.
 
     Args:
