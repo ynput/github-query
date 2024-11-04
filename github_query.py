@@ -31,6 +31,7 @@ def pr_labels(latest_release_date: str, query_tags: str, repo_name: str) -> None
 
     if not pr_labels:
         click.echo("")
+        return
 
     click.echo(pr_labels)
 
