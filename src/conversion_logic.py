@@ -1,24 +1,43 @@
 import logging
 import re
 
-from collections import namedtuple
-
+from typing import NamedTuple
 
 logger: logging.Logger = logging.getLogger(__name__)
-Changelog: type[Changelog] = namedtuple("Changelog", "labels title number url id")
 
 
-def sort_changes(changes_list: list[Changelog], changelog_label_list: list[str]) -> list[Changelog]:
+class Changelog(NamedTuple):
+    labels: list[str]
+    title: str
+    number: int
+    url: str
+    id: int
 
-    # TODO implement this logic in a more clever way
-    sorted_changes: list[Changelog] = []
 
-    for order_label in changelog_label_list:
-        for change in changes_list:
-            if any(label == order_label for label in change.labels):
-                sorted_changes.append(change)
+def filter_changes_per_label(pr_data: list[dict[str, str]], changelog_label_list: list[str]) -> list[Changelog]:
+    """Convert list of PR dictionaries to Changelog list
 
-    return sorted_changes
+    Args:
+        pr_data (list[dict[str, str]]): PR information and metadata
+        changelog_label_list (list[str]): Changelog labels
+
+    Returns:
+        list[Changelog]: List of changelog objects
+    """
+
+    changes_list: list[Changelog] = []
+
+    for pull_request in pr_data:
+        if pull_request.get("labels"):
+            changes_list.append(Changelog(labels=[label["name"] for label in pull_request["labels"]],
+                                           title=pull_request["title"],
+                                           number=pull_request["number"],
+                                           url=pull_request["url"],
+                                           id=pull_request["id"],
+                                           )
+                                        )
+
+    return changes_list
 
 
 # INFO currently not in use
@@ -52,35 +71,26 @@ def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
     return changelog_lines
 
 
-def filter_changes_per_label(pr_data: list[dict[str, str]], changelog_label_list: list[str]) -> list[Changelog]:
+def format_changelog_markdown(changes: list[Changelog], changelog_label_list: list[str]) -> str:
+    """Create markdown formatted changelog.
 
-    changes_list: list[Changelog] = []
+    Args:
+        changes (list[Changelog]): Changelogs in a list
+        changelog_label_list (list[str]): Label list to control order and filtering
 
-    for pull_request in pr_data:
+    Returns:
+        str: Markdown formatted string
+    """
 
-        # TODO refactor this to become more readable
-        label_list: list[str] = [label["name"] for label in pull_request["labels"] if label["name"] in changelog_label_list]
-        if label_list:
-            changes_list.append(Changelog(label_list, pull_request["title"], pull_request["number"], pull_request["url"], pull_request["id"]))
-
-    return changes_list
-
-
-def build_changelog_markdown(changes: list[Changelog]) -> str:
     changelog = "# Changelog"
-    previous_labels: list[str] = []
 
-    # TODO implement this logic in a more clever way, checkout `from itertools import groupby`
-    for change in changes:
-        current_labels: list[str] = change.labels
-        
-        if not any(label in previous_labels for label in current_labels):
-            label: str = change.labels[0].removeprefix("type: ")
-            changelog += f"\n\n## {label.capitalize()}\n\n"
+    for label in changelog_label_list:
+        formatted_label: str = label.removeprefix("type: ").capitalize()
+        changelog += f"\n\n## {formatted_label}\n\n"
 
-        changelog += f"* {change.title} - [{change.number}]({change.url})\n"
-
-        previous_labels = current_labels
+        for change in changes:
+            if change.labels[0] == label:
+                changelog += f"* {change.title} - [{change.number}]({change.url})\n"
 
     return changelog
 
@@ -128,7 +138,7 @@ def csv_string_to_list(input: str) -> list[str]:
     return []
 
 
-def get_version_increment(pr_label_list: list, patch_bump_list: list=[], minor_bump_list: list=[], major_bump_list: list=[]):
+def get_version_increment(pr_label_list: list[str], patch_bump_list: list[str]=[], minor_bump_list: list[str]=[], major_bump_list: list[str]=[]):
     """Figure out version increment based on PR labels.
 
     Args:
