@@ -135,10 +135,14 @@ def format_changelog_markdown(changes: List[Changelog], changelog_label_list: Li
             continue
 
         formatted_label: str = label.removeprefix("type: ").capitalize()
-        changelog += f"\n## {formatted_label}\n\n"
+        changelog += f"\n### **{formatted_label}**\n\n"
 
         for change in changes:
             if label in change.labels:
-                changelog += f"* {change.title} - [{change.number}]({change.url})\n"
+                changelog += f"<details>\n"
+                changelog += f"<summary>{change.title} - [#{change.number}]({change.url})</summary>\n\n"
+                changelog += f"details\n\n\n"
+                changelog += f"___\n\n"
+                changelog += f"</details>"
 
     return changelog
