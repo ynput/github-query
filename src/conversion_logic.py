@@ -1,7 +1,7 @@
 import logging
 import re
 
-from typing import NamedTuple, List
+from typing import NamedTuple, List, Set
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -12,56 +12,6 @@ class Changelog(NamedTuple):
     number: int
     url: str
     id: int
-
-
-def filter_changes_per_label(pr_data: List[dict[str, str]], changelog_label_list: List[str]) -> List[Changelog]:
-    """Convert list of PR dictionaries to Changelog list
-
-    Args:
-        pr_data (list[dict[str, str]]): PR information and metadata
-        changelog_label_list (list[str]): Changelog labels
-
-    Returns:
-        list[Changelog]: List of changelog objects
-    """
-
-    changes_list: List[Changelog] = []
-
-    for pull_request in pr_data:
-        if pull_request.get("labels"):
-            changes_list.append(Changelog(labels=[label["name"] for label in pull_request["labels"]],
-                                           title=pull_request["title"],
-                                           number=pull_request["number"],
-                                           url=pull_request["url"],
-                                           id=pull_request["id"],
-                                           )
-                                        )
-
-    return changes_list
-
-
-def format_changelog_markdown(changes: List[Changelog], changelog_label_list: List[str]) -> str:
-    """Create markdown formatted changelog.
-
-    Args:
-        changes (list[Changelog]): Changelogs in a list
-        changelog_label_list (list[str]): Label list to control order and filtering
-
-    Returns:
-        str: Markdown formatted string
-    """
-
-    changelog = "# Changelog"
-
-    for label in changelog_label_list:
-        formatted_label: str = label.removeprefix("type: ").capitalize()
-        changelog += f"\n\n## {formatted_label}\n\n"
-
-        for change in changes:
-            if change.labels[0] == label:
-                changelog += f"* {change.title} - [{change.number}]({change.url})\n"
-
-    return changelog
 
 
 def filter_unique_labels(pr_data: List[dict[str, str]]) -> List[str]:
@@ -138,3 +88,57 @@ def get_version_increment(pr_label_list: List[str], patch_bump_list: List[str]=[
 
     logger.warning("No relevant labels found for version increment.")
     return ""
+
+
+def filter_changes_per_label(pr_data: List[dict[str, str]], changelog_label_list: List[str]) -> List[Changelog]:
+    """Convert list of PR dictionaries to Changelog list
+
+    Args:
+        pr_data (list[dict[str, str]]): PR information and metadata
+        changelog_label_list (list[str]): Changelog labels
+
+    Returns:
+        list[Changelog]: List of changelog objects
+    """
+
+    changes_list: List[Changelog] = []
+
+    for pull_request in pr_data:
+        if pull_request.get("labels"):
+            changes_list.append(Changelog(labels=[label["name"] for label in pull_request["labels"]],
+                                           title=pull_request["title"],
+                                           number=pull_request["number"],
+                                           url=pull_request["url"],
+                                           id=pull_request["id"],
+                                           )
+                                        )
+
+    return changes_list
+
+
+def format_changelog_markdown(changes: List[Changelog], changelog_label_list: List[str]) -> str:
+    """Create markdown formatted changelog.
+
+    Args:
+        changes (list[Changelog]): Changelogs in a list
+        changelog_label_list (list[str]): Label list to control order and filtering
+
+    Returns:
+        str: Markdown formatted string
+    """
+
+    changelog = "# Changelog\n"
+    change_label_list: set[str] = {label for change in changes for label in change.labels}
+
+    for label in changelog_label_list:
+        if label not in change_label_list:
+            continue
+
+        formatted_label: str = label.removeprefix("type: ").capitalize()
+        changelog += f"\n## {formatted_label}\n\n"
+
+        for change in changes:
+            if label in change.labels:
+                changelog += f"* {change.title} - [{change.number}]({change.url})\n"
+
+    return changelog

@@ -2,6 +2,7 @@
 
 ## Enhancement
 
+* Improve applying render resolution and aspect ratio on render settings reset - [75](https://github.com/ynput/ayon-maya/pull/75)
 * Validate unique names only within the instance not in full scene - [70](https://github.com/ynput/ayon-maya/pull/70)
 
 ## Bug
