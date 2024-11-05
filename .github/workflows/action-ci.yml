@@ -44,15 +44,22 @@ jobs:
     steps:
         - name: Run action
           id: test-action
-          uses: ynput/github-query@main
+          uses: ynput/github-query@generate-changelog
           with:
             repo: "ynput/ayon-addon-action-testing"
             date: "2024-08-20T12:03:23Z"
-            query_parameters: "body,labels,title"
+            query_parameters: "body,labels,title,number,url,id"
+            changelog_labels: "feature,enhancement,bugfix,refactor,docs,test,pr"
 
         - name: Show results
           run: |
             echo "RAW-response: " && echo '${{ steps.test-action.outputs.raw-output }}'
             echo "Labels: " && echo '${{ steps.test-action.outputs.label-list }}'
             echo "Bump-increment: " && echo '${{ steps.test-action.outputs.bump-increment }}'
-            # echo "Changelog: " && echo '${{ steps.test-action.outputs.changelog-markdown }}'
+            echo "Changelog: " && echo '${{ steps.test-action.outputs.changelog-markdown }}'
+
+
+        - name: Show changelog formatted
+          shell: bash
+          run: |
+            printf '${{ steps.test-action.outputs.changelog-markdown }}'

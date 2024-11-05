@@ -1,12 +1,12 @@
 ---
 
-# TODO need strategy where to store defaults - which an be overriden by repo var
+# TODO need strategy where to store defaults - which an be override by repo var
 
 name: Github Release Information
 description: Fetch and convert data from github to use for a release trigger
 
 branding:
-  icon: plus
+  icon: arrow-left-circle
   color: green
 
 inputs:
@@ -19,6 +19,9 @@ inputs:
   query_parameters:
     description: Parameters to query for in pr Information
     required: true
+  changelog_labels:
+    description: CSV string of labels for changelog order
+    required: false
 
 outputs:
   raw-output:
@@ -30,9 +33,9 @@ outputs:
   bump-increment:
     description: Increment for version bumping - either `patch` or 'minor'
     value: ${{ steps.bump-increment.outputs.increment }}
-  # changelog-markdown:
-  #   description: String containing full makrdown syntax for release changelog information
-  #   value: ${{ steps.write-changelog.outputs.changelog }}
+  changelog-markdown:
+    description: String containing full markdown syntax for release changelog information
+    value: ${{ steps.write-changelog.outputs.changelog }}
 
 runs:
   using: composite
@@ -55,12 +58,8 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        label_list=$(python -c 'import github_query; print(github_query.get_labels(github_query.parse_args()))'  "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
-        if [[ "$label_list" == '[]' ]]; then
-          echo "label_list=''" >> $GITHUB_OUTPUT
-          exit 0
-        fi
-
+        label_list=$(python github_query.py pr-labels "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+       
         echo "label_list=$label_list" >> $GITHUB_OUTPUT
 
     - name: Get version increment
@@ -68,18 +67,26 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        increment=$(python -c 'import github_query; pr_labels = github_query.get_labels(github_query.parse_args()); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.get_version_increment(patch_bump_list=patch_repo_var, minor_bump_list=minor_repo_var, pr_label_list=pr_labels))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        increment=$(python github_query.py version-increment "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+
         echo "increment=$increment" >> $GITHUB_OUTPUT
 
-    # disabled until fixed
-    # - name: Prepare Changelog 
-    #   id: write-changelog
-    #   shell: bash
-    #   run: |
-    #     cd $GITHUB_ACTION_PATH
-    #     changelog=$(python -c 'import github_query; gh_query = github_query.parse_args(); patch_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="PATCH_BUMP_LABEL"); minor_repo_var = github_query.get_repo_var(repo="${{ inputs.repo }}", var_name="MINOR_BUMP_LABEL"); print(github_query.prepare_changelog_markdown(pr_query=gh_query, minor_bump_list=minor_repo_var, patch_bump_list=patch_repo_var))' "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
-    #     oneline_changelog=$(echo "$changelog" | base64 | tr -d '/n')
-    #     echo "oneline changelog: $oneline_changelog"
-    #     # echo "changelog=$oneline_changelog" >> $GITHUB_OUTPUT
+    # INFO multiline strings need to be precessed like this according to 
+    # INFO https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/workflow-commands-for-github-actions#multiline-strings
+    # INFO and
+    # INFO https://stackoverflow.com/questions/74137120/how-to-fix-or-avoid-error-unable-to-process-file-command-output-successfully/74232400#74232400
+    - name: Prepare Changelog
+      if: ${{ inputs.changelog_labels }}
+      id: write-changelog
+      shell: bash
+      run: |
+        cd $GITHUB_ACTION_PATH
+        changelog=$(python github_query.py generate-release-changelog "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}" "${{ inputs.changelog_labels }}")
+        delimiter="$(openssl rand -hex 8)"
+        {
+          echo "changelog<<${delimiter}"
+          echo "$changelog"
+          echo "${delimiter}"
+        } >> $GITHUB_OUTPUT
 
 ...

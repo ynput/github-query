@@ -1,0 +1,131 @@
+[
+  {
+    "body": "## Changelog Description\r\nIt seems that Maya UI is not completely visible or shutting down, `view.readColorBuffer` causes RuntimeError: (kFailure): Unexpected Internal Failure aas view is not visible.\r\n\r\n## Additional info\r\nThis applies only to running Maya in automatic tests.\r\n\r\n\r\n## Testing notes:\r\n\r\n1. publish in Maya ordinarily, active view thumbnail should be still captured for workfile instance\r\n",
+    "id": "PR_kwDOMQ8b8s58xOK1",
+    "labels": [
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABvFhgWw",
+        "name": "type: maintenance",
+        "description": "Changes to the code that don't affect product functionality (Technical debt, refactors etc.))",
+        "color": "BFD4F2"
+      }
+    ],
+    "number": 126,
+    "title": "Skip extraction of active view for automatic tests",
+    "url": "https://github.com/ynput/ayon-maya/pull/126"
+  },
+  {
+    "body": "## Changelog Description\r\n\r\nRemoves deprecated color management settings for Maya.\r\n\r\nThis is a tricky one, because this will be backwards compatible for everyone who had not previously EXPLICITLY enabled `ayon+settings://maya/imageio/workfile/enabled` because it would've been disabled before and in that case they were still using the deprecated settings. Now, the newer values will apply when enabled by default.\r\n\r\nIf the setting was overridden explicitly to disabled it will now log a message that the AYON Maya workfile color management is disabled.\r\n\r\n## Additional info\r\n<!-- Paragraphs of text giving context of additional technical information or code examples. -->\r\n\r\nThis was \"deprecated\" since OpenPype 3.15.5.\r\n\r\nAlso removed the legacy OCIO config settings that were for Maya 2020 and older since those are Py2 anyway and are already unsupported.\r\n\r\n## Testing notes:\r\n\r\n1. Test whether the color management settings work and apply as you'd expect\r\n2. Preferably you also test how this influences older projects from before and highlight where the issues may appear.\r\n",
+    "id": "PR_kwDOMQ8b8s57Ivvp",
+    "labels": [
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABvFMNlw",
+        "name": "bump minor",
+        "description": "",
+        "color": "F1F25D"
+      }
+    ],
+    "number": 103,
+    "title": "Remove deprecated color management settings ",
+    "url": "https://github.com/ynput/ayon-maya/pull/103"
+  },
+  {
+    "body": "## Changelog Description\r\n<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->\r\n\r\nThis fixes a case where looks failed to apply due to `None` values being present in the collected attributes.\r\nThese will now be ignored in collected. There's an edge case where Maya returns `None` for string attributes that have no values set - those are captured now explicitly to just `\"\"` to still collect and apply them later.\r\n\r\nExisting looks will now also apply correctly with `None` value in their look attributes, but the attributes with `None` values will be ignored with a warning.\r\n\r\n## Additional info\r\n<!-- Paragraphs of text giving context of additional technical information or code examples. -->\r\n\r\n## Testing notes:\r\n\r\n1. Load a model reference\r\n2. Create a string attribute, e.g. `test`\r\n3. Do not set any value for it.\r\n    - Maya will return None for this attribute, e.g. select the object and run:\r\n```python\r\nfrom maya import cmds\r\nprint(cmds.getAttr(\".test\"))\r\n```\r\nIt will print `None`.\r\n4. Publish the look for this mesh\r\n5. The published `.json` file should have attribute value for `test` set to `\"\"`\r\n\r\nTo test the 'backwards compatible fix':\r\n- Publish the same look with `develop` branch. The value will be `null` in the `.json` file.`\r\n- OR, just open the last published `.json` file, and edit the `\"\"` value to `null`\r\n\r\nThen, confirm that applying the look succeeds without errors but with a warning regarding the `None` value when applying with this PR. For example in my test run it logged:\r\n\r\n```\r\n// Warning: ayon_maya.api.lib : Skipping setting |_GRP|cube_GEO.test with value 'None'\r\n```",
+    "id": "PR_kwDOMQ8b8s56Ps1m",
+    "labels": [
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABqmH60w",
+        "name": "type: bug",
+        "description": "Something isn't working",
+        "color": "FFA696"
+      },
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABtfdQMg",
+        "name": "sponsored",
+        "description": "This is directly sponsored by a client or community member",
+        "color": "FCD63D"
+      }
+    ],
+    "number": 89,
+    "title": "AY-6654 Look: Fix None values in collecting and applying attributes",
+    "url": "https://github.com/ynput/ayon-maya/pull/89"
+  },
+  {
+    "body": "## Changelog Description\r\n<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->\r\n\r\nFix name in settings to match with name of plug-in to ensure settings are actually applied\r\n\r\n## Additional info\r\n<!-- Paragraphs of text giving context of additional technical information or code examples. -->\r\n\r\nOriginally reported by @LiborBatek here: https://github.com/ynput/ayon-maya/pull/68#issuecomment-2288791598\r\n\r\n## Testing notes:\r\n\r\n1. Settings should adjust the extractor's defaults\r\n2. Disabling it in settings should hide the attributes from the publisher UI\r\n",
+    "id": "PR_kwDOMQ8b8s55oDx8",
+    "labels": [
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABqmH60w",
+        "name": "type: bug",
+        "description": "Something isn't working",
+        "color": "FFA696"
+      }
+    ],
+    "number": 77,
+    "title": "Fix settings for Maya USD Animation Extractor",
+    "url": "https://github.com/ynput/ayon-maya/pull/77"
+  },
+  {
+    "body": "## Changelog Description\r\n<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->\r\n\r\nFix pixel aspect ratio / device aspect ratio getting messed up for Arnold renderer on render settings reset.\r\n\r\nAdditionally:\r\n- This now applies the resolution from the task entity, not the folder entity.\r\n- This now also applies pixel aspect ratio as defined on the entity.\r\n\r\n## Additional info\r\n<!-- Paragraphs of text giving context of additional technical information or code examples. -->\r\n\r\nThis fixes a bug when resetting render resolution for Arnold where on reset the pixel/device aspect ratio would be oddly set with a pixel aspect ratio that is not 1.0.\r\n\r\nE.g. left is before, right is after resetting render settings **without this PR**\r\n![image](https://github.com/user-attachments/assets/1b36d70b-2490-47f0-8731-d1ce5b20dfe9)\r\n\r\nAfter this PR the pixel aspect ratio will now adhere to what is specified on the task entity.\r\n_This bug was only occurring if the current renderer render settings were reset for was actively Arnold (mtoa) renderer._\r\n\r\n## Testing notes:\r\n\r\n1. Resetting render settings should work for the different renderers and should set the resolution (and pixel aspect ratio correctly!)\r\n    - [x] Arnold (mtoa)\r\n    - [x] Redshift (should work if Arnold works because it uses same attributes as Arnold)\r\n    - [x] V-Ray (may be good to check because it uses a custom render settings node!)\r\n    - [ ] Renderman (should work if Arnold works because it uses same attributes as Arnold)\r\n\r\nNote that this is about **Set Render Settings** or the feature that it automatically does so on creating a render publish instance in the scene (enabled by default).\r\n\r\n![image](https://github.com/user-attachments/assets/ad8b0534-0921-4dc2-add9-eb276326030f)\r\n",
+    "id": "PR_kwDOMQ8b8s55L5zV",
+    "labels": [
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABqmH60w",
+        "name": "type: bug",
+        "description": "Something isn't working",
+        "color": "FFA696"
+      },
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABqmH62w",
+        "name": "type: enhancement",
+        "description": "Improvement of existing functionality or minor addition",
+        "color": "b9f29d"
+      },
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABtfdQMg",
+        "name": "sponsored",
+        "description": "This is directly sponsored by a client or community member",
+        "color": "FCD63D"
+      }
+    ],
+    "number": 75,
+    "title": "Improve applying render resolution and aspect ratio on render settings reset",
+    "url": "https://github.com/ynput/ayon-maya/pull/75"
+  },
+  {
+    "body": "## Changelog Description\r\n<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->\r\n\r\nOn Maya scene exports only include the relevant history for the selected nodes downstream and upstream and not upstream, and also their downstream descendant children.\r\n\r\n## Additional info\r\n<!-- Paragraphs of text giving context of additional technical information or code examples. -->\r\n\r\nNote: This may affect maya scene exports, camera rig exports and layout exports. However, I do feel this is a way more sensible default behavior on exports _with_ construction history enabled.\r\n\r\nWith this change, if you have a hierarchy like:\r\n```\r\ngrp/\r\n    obj1\r\n    obj2\r\n```\r\nAnd `obj1` is inside the instance then after this PR `obj2` is not included.\r\nBefore this PR all other descendents from upstream groups would be included, regardless of whether they were \"inputs\" to the `obj1`.\r\n\r\nAfter this PR, if `obj2` is an input connection to `obj1` (e.g. there are active constraints driving `obj1` or some other connections driving it) then `obj2` **will still be included.**\r\n\r\nAs such, only objects actively contributing to members of the instance will still be included in the output.\r\n\r\n## Testing notes:\r\n\r\n1. Recreate the aforementioned hierarchy from additional info.\r\n2. Publish `obj1` - it should not include `obj2`\r\n3. Now make a connection from `obj2` to `obj1` (e.g. translate connection)\r\n4. Now `obj2` should also be included in `obj2`.\r\n5. Now disconnect the connection, and key `obj1`  transforms.\r\n6. The keys should be exported along just fine.",
+    "id": "PR_kwDOMQ8b8s542vNM",
+    "labels": [
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABqmH60w",
+        "name": "type: bug",
+        "description": "Something isn't working",
+        "color": "FFA696"
+      }
+    ],
+    "number": 71,
+    "title": "Maya Scene exports do not default to including nodes that not children of members",
+    "url": "https://github.com/ynput/ayon-maya/pull/71"
+  },
+  {
+    "body": "## Changelog Description\r\n<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->\r\n\r\nValidate unique names only within the instance not in full scene\r\n\r\n## Additional info\r\n<!-- Paragraphs of text giving context of additional technical information or code examples. -->\r\n\r\nThis is allowed:\r\n![image](https://github.com/user-attachments/assets/ce25d2aa-fa3a-4b25-b0ff-b58ebe7b6124)\r\n\r\nThis is not allowed:\r\n![image](https://github.com/user-attachments/assets/67b3099b-18a1-4779-ae1c-422887675ba8)\r\n\r\nThe validation only checks for member transforms that are included in the export instance.\r\n\r\n![image](https://github.com/user-attachments/assets/e6950101-1210-423b-afe8-6797c33ea5bf)\r\n\r\n## Testing notes:\r\n\r\nMake sure to enable the validator: `ayon+settings://maya/publish/ValidateUniqueNames/enabled`\r\n\r\n1. Create a scene with non-unique node names (e.g. see screenshots above).\r\n2. When both included in the instance it should not be allowed, \r\n3. Otherwise when just present elsewhere in the scene unrelated to the export it should be allowed.\r\n",
+    "id": "PR_kwDOMQ8b8s54uX2I",
+    "labels": [
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABqmH62w",
+        "name": "type: enhancement",
+        "description": "Improvement of existing functionality or minor addition",
+        "color": "b9f29d"
+      },
+      {
+        "id": "LA_kwDOMQ8b8s8AAAABtfdQMg",
+        "name": "sponsored",
+        "description": "This is directly sponsored by a client or community member",
+        "color": "FCD63D"
+      }
+    ],
+    "number": 70,
+    "title": "Validate unique names only within the instance not in full scene",
+    "url": "https://github.com/ynput/ayon-maya/pull/70"
+  }
+]

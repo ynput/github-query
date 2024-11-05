@@ -1,162 +1,83 @@
 """
-This script is written in a certain - maybe even unconventional way - by intention.
-It's supposed to be run from comamndline right away to be used in a github action workflow yaml file.
-Additonally it's test suite relies mainly on putest and therefore the functions need to be importable to the pytest script.
+This script is supposed to be run from command line right away to be used in a github action workflow yaml file.
+Additionally it's test suite relies mainly on pytest and therefore the functions need to be importable to the pytest script.
 """
 
-import argparse
-import json
-import logging
-import re
-import subprocess
+import click
+from src import conversion_logic, queries
+from typing import List
 
 
-logger = logging.getLogger(__name__)
+@click.group()
+def cli() -> None:
+    pass
 
-def parse_args() -> dict:
-    """Parse command-line arguments and store them in a global variable."""
 
-    parser = argparse.ArgumentParser(description="A python script to convert GitHub PR information to a more simple format.")
-    parser.add_argument("repo", type=str, help="Repository name consisting of 'repo-owner/repo-name'")
-    parser.add_argument("query_parameters", type=str, help="Keys to query for.")
-    parser.add_argument("date", type=str, default="2024-07-08T09:48:33Z", help="Latest release date.")
-    parsed_args = parser.parse_args()
+@cli.command()
+@click.argument('repo_name', type=click.STRING)
+@click.argument('query_tags', type=click.STRING)
+@click.argument('latest_release_date', type=click.STRING)
+def pr_labels(latest_release_date: str, query_tags: str, repo_name: str) -> None:
+    """Get a list of all version relevant PR labels.
 
-    repo_name = parsed_args.repo
-    query_tags = parsed_args.query_parameters.split(',')
-    latest_release_date = parsed_args.date
+    latest_release_date (str): datatime string\n
+    query_tags (str): csv string\n
+    repo_name (str): repo name as <owner><repo>\n
+    """
+    
+    query_tags_list: List[str] = conversion_logic.csv_string_to_list(input=query_tags)
+    pr_result: List[dict[str, str]] = queries.query_merged_prs(latest_release_date, query_tags_list, repo_name)
+    pr_labels: List[str] = conversion_logic.filter_unique_labels(pr_data=pr_result)
 
-    command = f"gh pr list --state merged --search 'merged:>={latest_release_date}' --json {','.join(query_tags)} --repo {repo_name}"
-    pr_json = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if not pr_labels:
+        click.echo("")
+        return
 
-    return json.loads(pr_json.stdout)
+    click.echo(pr_labels)
 
-def get_changelog(pr_data, changelog_start="## Changelog", heading="##"):
-    """Get list of changes from a PRs changelog.
 
-    Args:
-        pr_body (list(str)): List of PR body contents.
-        changelog_start (str, optional): Indicates markdown changelog section. Defaults to "## Changes".
-        heading (str, optional): Markdown heading. Defaults to "##".
+@cli.command()
+@click.argument('repo_name', type=click.STRING)
+@click.argument('query_tags', type=click.STRING)
+@click.argument('latest_release_date', type=click.STRING)
+def version_increment(latest_release_date: str, query_tags: str, repo_name: str):
+    """Output a calculated version increment suggestion.
 
-    Returns:
-        list(str): List of changes found.
+    latest_release_date (str): datetime string\n
+    query_tags (str): csv string\n
+    repo_name (str): repo name as <owner><repo>\n
     """
 
-    lines = pr_data.splitlines()
-    changelog_section = None
-    changelog_lines = []
+    query_tags_list: list[str] = conversion_logic.csv_string_to_list(query_tags)
+    pr_result: list[dict[str, str]] = queries.query_merged_prs(latest_release_date, query_tags_list, repo_name)
+    pr_labels: conversion_logic.List[str] = conversion_logic.filter_unique_labels(pr_data=pr_result)
+    patch_repo_var_list: conversion_logic.List[str] = conversion_logic.csv_string_to_list(queries.get_repo_var(repo=repo_name, var_name="PATCH_BUMP_LABEL"))
+    minor_repo_var_list: conversion_logic.List[str] = conversion_logic.csv_string_to_list(queries.get_repo_var(repo=repo_name, var_name="MINOR_BUMP_LABEL"))
+    increment = conversion_logic.get_version_increment(patch_bump_list=patch_repo_var_list, minor_bump_list=minor_repo_var_list, pr_label_list=pr_labels)
 
-    for line in lines:
-        if line.startswith(changelog_start):
-            changelog_section = True
-            continue
-
-        if changelog_section and line.startswith(heading):
-            break
-
-        if changelog_section and line.startswith("* "):
-            changelog_lines.append(line.strip("* ").strip())
-
-    return changelog_lines
-
-def changelog_per_label(json_dict):
-    # TODO replace with labels fetched from repo variables
-    changelog_labels = ["bugfix", "enhancement", "feature"]
-    labels = []
-    for item in json_dict:
-        labels.append(item["labels"])
-        if any(item in changelog_labels for item in labels):
-            pass
-
-def prepare_changelog_markdown(pr_query, minor_bump_list, patch_bump_list):   
-    # ? should version bump labels also be filter for changelog ?
-    label_list = minor_bump_list + patch_bump_list
-    changelog = ""
-
-    for pr in pr_query:
-        # get all label names in a list
-        pr_label_list = [label["name"] for label in pr["labels"]]
-        fitlered_label = list(set(label_list).intersection(pr_label_list))[0]
-
-        if fitlered_label:
-            change_list = get_changelog(pr_data=pr["body"])
-            
-            changelog += f"## {fitlered_label.capitalize()}\n"
-            changelog += "".join([f"* {change}\n" for change in change_list])
-            changelog += "\n"
-
-    return changelog
+    click.echo(increment)
 
 
-def get_labels(pr_data: dict) -> list:
-    """Filter all unique labels from dictionary.
+@cli.command()
+@click.argument('repo_name', type=click.STRING)
+@click.argument('query_tags', type=click.STRING)
+@click.argument('latest_release_date', type=click.STRING)
+@click.argument('changelog_labels', type=click.STRING)
+def generate_release_changelog(latest_release_date: str, query_tags: str, repo_name: str, changelog_labels: str) -> None:
+    """Output a markdown formatted changelog.
 
-    Args:
-        pr_data (dict): Github PR query result
-
-    Returns:
-        [str]: Liste of unique labels strings found or `None`.
+    latest_release_date (str): datetime string\n
+    query_tags (str): csv string\n
+    repo_name (str): repo name as <owner><repo>\n
     """
 
-    labels = set()
+    query_tags_list: list[str] = conversion_logic.csv_string_to_list(query_tags)
+    pr_result: list[dict[str, str]] = queries.query_merged_prs(latest_release_date, query_tags_list, repo_name)
+    changelog_labels_result: list[str] = conversion_logic.csv_string_to_list(changelog_labels)
+    pr_filtered: list[conversion_logic.Changelog] = conversion_logic.filter_changes_per_label(pr_data=pr_result, changelog_label_list=changelog_labels_result)
+    markdown_changelog: str = conversion_logic.format_changelog_markdown(changes=pr_filtered, changelog_label_list=changelog_labels_result)
 
-    for item in pr_data:
-        if not item.get("labels"):
-            return []
-        for label in item["labels"]:
-            if not label.get("name"):
-                return []
+    click.echo(markdown_changelog)
 
-            labels.add(label["name"])
-
-    return list(labels)
-
-def get_repo_var(repo: str, var_name: str) -> list:
-    """Query labels from repository variables.
-
-    Args:
-        repo (str): Repository name `owner/repo-name`
-        var_name (str): Repo variable name
-
-    Returns:
-        str: Comma separated value string.
-    """
-    labels = subprocess.run(
-        ["gh", "variable", "get", var_name, "--repo", repo],
-        capture_output=True,
-        text=True,
-        check=True
-    )
-
-    return csv_string_to_list(labels.stdout)
-
-def csv_string_to_list(input: str) -> list:
-    if input:
-        return re.split(r',\s*', input.strip())
-
-    return []
-
-def get_version_increment(patch_bump_list: list, minor_bump_list: list, pr_label_list: list):
-    """Figure out version increment based on PR labels.
-
-    Args:
-        patch_bump_list ([str]): Labels for bumping patch version
-        minor_bump_list ([str]): Labels for bumping minor version
-        label_list([str]): Labels found in PRs
-
-    Returns:
-        str: version increment
-    """
-
-    if not pr_label_list:
-        return ""
-
-    # TODO add major bump option
-    if any(label in pr_label_list for label in minor_bump_list):
-        return "minor"
-
-    if any(label in pr_label_list for label in patch_bump_list):
-        return "patch"
-
-    return ""
+if __name__ == "__main__":
+    cli()
