@@ -35,6 +35,7 @@ jobs:
         run: |
           pip install pytest pytest-cov
           pytest
+        working-directory: ${{ github.workspace }}/tests
 
   run-action:
     runs-on: ubuntu-latest
