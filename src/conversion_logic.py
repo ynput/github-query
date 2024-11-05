@@ -1,7 +1,7 @@
 import logging
 import re
 
-from typing import NamedTuple, List, Set
+from typing import NamedTuple, List
 
 logger: logging.Logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ def csv_string_to_list(input: str) -> List[str]:
     return []
 
 
-def get_version_increment(pr_label_list: List[str], patch_bump_list: List[str]=[], minor_bump_list: List[str]=[], major_bump_list: List[str]=[]):
+def get_version_increment(pr_label_list: List[str] | None, patch_bump_list: List[str]=[], minor_bump_list: List[str]=[], major_bump_list: List[str] | str=[]):
     """Figure out version increment based on PR labels.
 
     Args:

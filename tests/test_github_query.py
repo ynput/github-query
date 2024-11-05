@@ -6,53 +6,13 @@ from src import conversion_logic
 
 @pytest.fixture
 def pr_api_output() -> List[dict[str, Any]]:
-    return [
-        {
-            "body": "# Bug Fix PR Template\r\n\r\n[ x] Feature/Enhancement<br>\r\n[ ] Bugfix<br>\r\n[ ] Documentation update<br>\r\n\r\n## Summary\r\n\r\n<!--Provide a concise description of your changes and implementation.-->\r\n\r\n## Root Cause Analysis\r\n\r\n[Issue Link](https://github.com/ynput/ci-testing/blob/develop/.github/ISSUE_TEMPLATE/bug_report.yml)<br>\r\n<!--Detail the reason for your change and which benefits result from it.-->\r\n\r\n## Changes\r\n\r\n<!--Outline the changes made in a list.-->\r\n* Add more test\r\n* Was very important\r\n* Needed to add this here\r\n\r\n## Testing Strategy\r\n\r\n<!--Explain how the fix has been tested to ensure the bug is resolved without introducing new issues.-->\r\n\r\n## Checklist\r\n\r\n* [ x] The fix has been locally tested\r\n* [ x] New unit tests have been added to prevent future regressions\r\n* [ x] The documentation has been updated if necessary\r\n\r\n## Additional Notes\r\n\r\n<!--Any further information needed to understand the fix or its impact.-->",
-            "labels": [
-            {
-                "id": "LA_kwDOMje8_88AAAABtOJ1Ig",
-                "name": "enhancement",
-                "description": "New feature or request",
-                "color": "b9f29d"
-            }
-            ],
-            "title": "Add more data"
-        },
-        {
-            "body": "# Date file added\r\n\r\n## Summary\r\n\r\nSome awesome summary going on right here.\r\n\r\n## Root Cause Analysis\r\n\r\n[Issue Link](https://github.com/ynput/ci-testing/blob/develop/.github/ISSUE_TEMPLATE/bug_report.yml)<br>\r\nDate file so absolutely needed.\r\n\r\n## Changes\r\n\r\n<!--Outline the changes made in a list.-->\r\n* Run a command\r\n* Pipe its output to a text file\r\n* Commit dem stuff\r\n\r\n## Testing Strategy\r\n\r\nnahhhhh\r\n\r\n## Checklist\r\n\r\n* [x] The fix has been locally tested\r\n* [x] New unit tests have been added to prevent future regressions\r\n* [x] The documentation has been updated if necessary\r\n\r\n## Additional Notes\r\n\r\nNop",
-            "labels": [
-            {
-                "id": "LA_kwDOMje8_88AAAABtOJ1Gw",
-                "name": "bugfix",
-                "description": "Something got fixed",
-                "color": "ff9195"
-            }
-            ],
-            "title": "Add date file"
-        }
-        ]
+    with open("pr_api_output.json") as file:
+        return json.load(file)
 
 @pytest.fixture
-def pr_api_output_missing_label():
-    return [
-        {
-            "body": "# Bug Fix PR Template\r\n\r\n[ x] Feature/Enhancement<br>\r\n[ ] Bugfix<br>\r\n[ ] Documentation update<br>\r\n\r\n## Summary\r\n\r\n<!--Provide a concise description of your changes and implementation.-->\r\n\r\n## Root Cause Analysis\r\n\r\n[Issue Link](https://github.com/ynput/ci-testing/blob/develop/.github/ISSUE_TEMPLATE/bug_report.yml)<br>\r\n<!--Detail the reason for your change and which benefits result from it.-->\r\n\r\n## Changes\r\n\r\n<!--Outline the changes made in a list.-->\r\n* Add more test\r\n* Was very important\r\n* Needed to add this here\r\n\r\n## Testing Strategy\r\n\r\n<!--Explain how the fix has been tested to ensure the bug is resolved without introducing new issues.-->\r\n\r\n## Checklist\r\n\r\n* [ x] The fix has been locally tested\r\n* [ x] New unit tests have been added to prevent future regressions\r\n* [ x] The documentation has been updated if necessary\r\n\r\n## Additional Notes\r\n\r\n<!--Any further information needed to understand the fix or its impact.-->",
-            "title": "Add more data"
-        },
-        {
-            "body": "# Date file added\r\n\r\n## Summary\r\n\r\nSome awesome summary going on right here.\r\n\r\n## Root Cause Analysis\r\n\r\n[Issue Link](https://github.com/ynput/ci-testing/blob/develop/.github/ISSUE_TEMPLATE/bug_report.yml)<br>\r\nDate file so absolutely needed.\r\n\r\n## Changes\r\n\r\n<!--Outline the changes made in a list.-->\r\n* Run a command\r\n* Pipe its output to a text file\r\n* Commit dem stuff\r\n\r\n## Testing Strategy\r\n\r\nnahhhhh\r\n\r\n## Checklist\r\n\r\n* [x] The fix has been locally tested\r\n* [x] New unit tests have been added to prevent future regressions\r\n* [x] The documentation has been updated if necessary\r\n\r\n## Additional Notes\r\n\r\nNop",
-            "labels": [
-            {
-                "id": "LA_kwDOMje8_88AAAABtOJ1Gw",
-                "name": "bug",
-                "description": "Something isn't working",
-                "color": "ff9195"
-            }
-            ],
-            "title": "Add date file"
-        }
-        ]
+def pr_api_output_missing_label() -> List[dict[str, Any]]:
+    with open("pr_api_output_missing_label.json") as file:
+        return json.load(file)
 
 @pytest.fixture
 def major_bump() -> List[str]:
@@ -146,8 +106,8 @@ def test_get_labels(pr_api_output: List[dict[str, Any]]) -> None:
     assert isinstance(labels, list)
     assert set(labels) == {"bugfix", "enhancement"}
 
-def test_get_labels_missing_input(pr_api_output_missing_label) -> None:
-    labels = conversion_logic.filter_unique_labels(pr_data=pr_api_output_missing_label)
+def test_get_labels_missing_input(pr_api_output_missing_label: List[dict[str, Any]]) -> None:
+    labels: List[str] = conversion_logic.filter_unique_labels(pr_data=pr_api_output_missing_label)
 
     assert labels == []
 
@@ -199,7 +159,7 @@ def test_get_version_increment_minor(minor_bump: List[str], patch_bump: List[str
 
     assert increment == "minor"
 
-def test_get_version_increment_minor(minor_bump: List[str], patch_bump: List[str], major_bump: List[str], pr_labels_epic: List[str]) -> None:
+def test_get_version_increment_major(minor_bump: List[str], patch_bump: List[str], major_bump: List[str], pr_labels_epic: List[str]) -> None:
     increment = conversion_logic.get_version_increment(
         pr_label_list=pr_labels_epic,
         patch_bump_list=patch_bump,
