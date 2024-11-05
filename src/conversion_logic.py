@@ -12,6 +12,7 @@ class Changelog(NamedTuple):
     number: int
     url: str
     id: int
+    body: str
 
 
 def filter_unique_labels(pr_data: List[dict[str, str]]) -> List[str]:
@@ -110,10 +111,41 @@ def filter_changes_per_label(pr_data: List[dict[str, str]], changelog_label_list
                                            number=pull_request["number"],
                                            url=pull_request["url"],
                                            id=pull_request["id"],
+                                           body=pull_request["body"],
                                            )
                                         )
 
     return changes_list
+
+
+def get_changelog(pr_body: str, changelog_desc: str ="## Changelog Description", heading: str ="##") -> List[str]:
+    """Get list of changes from a PRs changelog.
+
+    Args:
+        pr_body list(str): PR body content
+        changelog_desc (str, optional): Indicates markdown changelog section. Defaults to "## Changes"
+        heading (str, optional): Markdown heading. Defaults to "##"
+
+    Returns:
+        list(str): List of changes found.
+    """
+
+    lines: list[str] = pr_body.splitlines()
+    changelog_section = None
+    description_lines: list[str] = []
+
+    for line in lines:
+        if line.startswith(changelog_desc):
+            changelog_section = True
+            continue
+
+        if changelog_section and line.startswith(heading):
+            break
+
+        if changelog_section:
+            description_lines.append(line.strip())
+
+    return description_lines
 
 
 def format_changelog_markdown(changes: List[Changelog], changelog_label_list: List[str]) -> str:
@@ -139,10 +171,15 @@ def format_changelog_markdown(changes: List[Changelog], changelog_label_list: Li
 
         for change in changes:
             if label in change.labels:
+                changelog_desc: List[str] = get_changelog(change.body, changelog_desc="## Changelog Description", heading="##")
+
                 changelog += f"<details>\n"
                 changelog += f"<summary>{change.title} - [#{change.number}]({change.url})</summary>\n\n"
-                changelog += f"details\n\n\n"
+                
+                for desc_line in changelog_desc:
+                    changelog += f"{desc_line}\n"
+
                 changelog += f"___\n\n"
-                changelog += f"</details>"
+                changelog += f"</details>\n"
 
     return changelog

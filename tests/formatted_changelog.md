@@ -1,17 +1,89 @@
 # Changelog
 
-## Enhancement
+### **Enhancement**
 
-* Improve applying render resolution and aspect ratio on render settings reset - [75](https://github.com/ynput/ayon-maya/pull/75)
-* Validate unique names only within the instance not in full scene - [70](https://github.com/ynput/ayon-maya/pull/70)
+<details>
+<summary>Improve applying render resolution and aspect ratio on render settings reset - [#75](https://github.com/ynput/ayon-maya/pull/75)</summary>
 
-## Bug
+<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
 
-* AY-6654 Look: Fix None values in collecting and applying attributes - [89](https://github.com/ynput/ayon-maya/pull/89)
-* Fix settings for Maya USD Animation Extractor - [77](https://github.com/ynput/ayon-maya/pull/77)
-* Improve applying render resolution and aspect ratio on render settings reset - [75](https://github.com/ynput/ayon-maya/pull/75)
-* Maya Scene exports do not default to including nodes that not children of members - [71](https://github.com/ynput/ayon-maya/pull/71)
+Fix pixel aspect ratio / device aspect ratio getting messed up for Arnold renderer on render settings reset.
 
-## Maintenance
+Additionally:
+- This now applies the resolution from the task entity, not the folder entity.
+- This now also applies pixel aspect ratio as defined on the entity.
 
-* Skip extraction of active view for automatic tests - [126](https://github.com/ynput/ayon-maya/pull/126)
+___
+
+</details>
+<details>
+<summary>Validate unique names only within the instance not in full scene - [#70](https://github.com/ynput/ayon-maya/pull/70)</summary>
+
+<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
+
+Validate unique names only within the instance not in full scene
+
+___
+
+</details>
+
+### **Bug**
+
+<details>
+<summary>AY-6654 Look: Fix None values in collecting and applying attributes - [#89](https://github.com/ynput/ayon-maya/pull/89)</summary>
+
+<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
+
+This fixes a case where looks failed to apply due to `None` values being present in the collected attributes.
+These will now be ignored in collected. There's an edge case where Maya returns `None` for string attributes that have no values set - those are captured now explicitly to just `""` to still collect and apply them later.
+
+Existing looks will now also apply correctly with `None` value in their look attributes, but the attributes with `None` values will be ignored with a warning.
+
+___
+
+</details>
+<details>
+<summary>Fix settings for Maya USD Animation Extractor - [#77](https://github.com/ynput/ayon-maya/pull/77)</summary>
+
+<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
+
+Fix name in settings to match with name of plug-in to ensure settings are actually applied
+
+___
+
+</details>
+<details>
+<summary>Improve applying render resolution and aspect ratio on render settings reset - [#75](https://github.com/ynput/ayon-maya/pull/75)</summary>
+
+<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
+
+Fix pixel aspect ratio / device aspect ratio getting messed up for Arnold renderer on render settings reset.
+
+Additionally:
+- This now applies the resolution from the task entity, not the folder entity.
+- This now also applies pixel aspect ratio as defined on the entity.
+
+___
+
+</details>
+<details>
+<summary>Maya Scene exports do not default to including nodes that not children of members - [#71](https://github.com/ynput/ayon-maya/pull/71)</summary>
+
+<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
+
+On Maya scene exports only include the relevant history for the selected nodes downstream and upstream and not upstream, and also their downstream descendant children.
+
+___
+
+</details>
+
+### **Maintenance**
+
+<details>
+<summary>Skip extraction of active view for automatic tests - [#126](https://github.com/ynput/ayon-maya/pull/126)</summary>
+
+It seems that Maya UI is not completely visible or shutting down, `view.readColorBuffer` causes RuntimeError: (kFailure): Unexpected Internal Failure aas view is not visible.
+
+___
+
+</details>
