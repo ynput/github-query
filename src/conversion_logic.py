@@ -118,7 +118,7 @@ def filter_changes_per_label(pr_data: List[dict[str, str]], changelog_label_list
     return changes_list
 
 
-def get_changelog(pr_body: str, changelog_desc: str ="## Changelog Description", heading: str ="##") -> List[str]:
+def get_changelog_description(pr_body: str, changelog_desc: str ="## Changelog Description", heading: str ="##") -> List[str]:
     """Get list of changes from a PRs changelog.
 
     Args:
@@ -171,11 +171,11 @@ def format_changelog_markdown(changes: List[Changelog], changelog_label_list: Li
 
         for change in changes:
             if label in change.labels:
-                changelog_desc: List[str] = get_changelog(change.body, changelog_desc="## Changelog Description", heading="##")
-
                 changelog += f"<details>\n"
                 changelog += f"<summary>{change.title} - [#{change.number}]({change.url})</summary>\n\n"
-                
+
+                changelog_desc: List[str] = get_changelog_description(change.body, changelog_desc="## Changelog Description", heading="##")
+
                 for desc_line in changelog_desc:
                     changelog += f"{desc_line}\n"
 
