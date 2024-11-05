@@ -249,6 +249,8 @@ def test_format_changelog_markdown(merged_pr_samples: List[dict[str, str]], chan
     filtered_pr_list: List[conversion_logic.Changelog] = conversion_logic.filter_changes_per_label(pr_data=merged_pr_samples, changelog_label_list=changelog_label_list)
     changelog_result: str = conversion_logic.format_changelog_markdown(changes=filtered_pr_list, changelog_label_list=changelog_label_list)
 
+    # print(changelog_result)
+
     assert changelog_result == changelog_markdown
 
 def test_format_changelog_markdown_no_data(changelog_label_list: List[str]) -> None:

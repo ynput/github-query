@@ -172,7 +172,7 @@ def format_changelog_markdown(changes: List[Changelog], changelog_label_list: Li
         for change in changes:
             if label in change.labels:
                 changelog += f"<details>\n"
-                changelog += f"<summary>{change.title} - [#{change.number}]({change.url})</summary>\n\n"
+                changelog += f"<summary>{change.title} - <a href=\"{change.url}\")>#{change.number}</a></summary>\n\n"
 
                 changelog_desc: List[str] = get_changelog_description(change.body, changelog_desc="## Changelog Description", heading="##")
 
