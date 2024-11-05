@@ -5,7 +5,6 @@
 <details>
 <summary>Improve applying render resolution and aspect ratio on render settings reset - <a href="https://github.com/ynput/ayon-maya/pull/75")>#75</a></summary>
 
-<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
 
 Fix pixel aspect ratio / device aspect ratio getting messed up for Arnold renderer on render settings reset.
 
@@ -19,7 +18,6 @@ ___
 <details>
 <summary>Validate unique names only within the instance not in full scene - <a href="https://github.com/ynput/ayon-maya/pull/70")>#70</a></summary>
 
-<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
 
 Validate unique names only within the instance not in full scene
 
@@ -32,7 +30,6 @@ ___
 <details>
 <summary>AY-6654 Look: Fix None values in collecting and applying attributes - <a href="https://github.com/ynput/ayon-maya/pull/89")>#89</a></summary>
 
-<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
 
 This fixes a case where looks failed to apply due to `None` values being present in the collected attributes.
 These will now be ignored in collected. There's an edge case where Maya returns `None` for string attributes that have no values set - those are captured now explicitly to just `""` to still collect and apply them later.
@@ -45,7 +42,6 @@ ___
 <details>
 <summary>Fix settings for Maya USD Animation Extractor - <a href="https://github.com/ynput/ayon-maya/pull/77")>#77</a></summary>
 
-<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
 
 Fix name in settings to match with name of plug-in to ensure settings are actually applied
 
@@ -55,7 +51,6 @@ ___
 <details>
 <summary>Improve applying render resolution and aspect ratio on render settings reset - <a href="https://github.com/ynput/ayon-maya/pull/75")>#75</a></summary>
 
-<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
 
 Fix pixel aspect ratio / device aspect ratio getting messed up for Arnold renderer on render settings reset.
 
@@ -69,7 +64,6 @@ ___
 <details>
 <summary>Maya Scene exports do not default to including nodes that not children of members - <a href="https://github.com/ynput/ayon-maya/pull/71")>#71</a></summary>
 
-<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->
 
 On Maya scene exports only include the relevant history for the selected nodes downstream and upstream and not upstream, and also their downstream descendant children.
 

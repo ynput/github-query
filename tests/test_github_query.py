@@ -71,6 +71,15 @@ def merged_pr_samples():
 def changelog_markdown() -> str:
     with open("formatted_changelog.md") as file:
         return file.read()
+    
+@pytest.fixture
+def changelog_body() -> str:
+    with open("changelog.md") as file:
+        return file.read()
+
+@pytest.fixture
+def changelog_description() -> List[str]:
+    return ['Some more information', '', '- Prototype loading of USD references into a Maya USD proxy while keeping it managed by the pipeline', '- Prototype loading of Maya references into a Maya USD proxy while keeping it managed by the pipeline']
 
 @pytest.fixture
 def minor_bump() -> list[str]:
@@ -244,13 +253,16 @@ def test_filter_changes_per_label_types(merged_pr_samples: List[dict[str, str]],
 
     assert all(isinstance(changelog, conversion_logic.Changelog) for changelog in filtered_pr_list)
 
+def test_get_changelog_description(changelog_body: str, changelog_description: str) -> None:
+    filtered_changelog: List[str] = conversion_logic.get_changelog_description(changelog_body)
+
+    assert filtered_changelog == changelog_description
 
 def test_format_changelog_markdown(merged_pr_samples: List[dict[str, str]], changelog_label_list: List[str], changelog_markdown: str) -> None:
     filtered_pr_list: List[conversion_logic.Changelog] = conversion_logic.filter_changes_per_label(pr_data=merged_pr_samples, changelog_label_list=changelog_label_list)
     changelog_result: str = conversion_logic.format_changelog_markdown(changes=filtered_pr_list, changelog_label_list=changelog_label_list)
 
-    # print(changelog_result)
-
+    print(changelog_result)
     assert changelog_result == changelog_markdown
 
 def test_format_changelog_markdown_no_data(changelog_label_list: List[str]) -> None:

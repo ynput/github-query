@@ -145,6 +145,10 @@ def get_changelog_description(pr_body: str, changelog_desc: str ="## Changelog D
         if changelog_section:
             description_lines.append(line.strip())
 
+    for index in [0, -1]:
+        if not description_lines[index]:
+            description_lines.pop(index)
+
     return description_lines
 
 
@@ -177,9 +181,11 @@ def format_changelog_markdown(changes: List[Changelog], changelog_label_list: Li
                 changelog_desc: List[str] = get_changelog_description(change.body, changelog_desc="## Changelog Description", heading="##")
 
                 for desc_line in changelog_desc:
+                    if desc_line.startswith("<!--"):
+                        continue
                     changelog += f"{desc_line}\n"
 
-                changelog += f"___\n\n"
+                changelog += f"\n___\n\n"
                 changelog += f"</details>\n"
 
     return changelog
