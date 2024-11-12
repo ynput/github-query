@@ -1,6 +1,6 @@
 # Changelog
 
-### **Enhancement**
+### 💚 **Enhancement**
 
 <details>
 <summary>Improve applying render resolution and aspect ratio on render settings reset - <a href="https://github.com/ynput/ayon-maya/pull/75")>#75</a></summary>
@@ -25,7 +25,7 @@ ___
 
 </details>
 
-### **Bugfix**
+### 🐛 **Bugfix**
 
 <details>
 <summary>AY-6654 Look: Fix None values in collecting and applying attributes - <a href="https://github.com/ynput/ayon-maya/pull/89")>#89</a></summary>

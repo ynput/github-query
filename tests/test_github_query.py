@@ -33,6 +33,11 @@ def changelog_markdown() -> str:
         return file.read()
     
 @pytest.fixture
+def changelog_markdown_icons() -> str:
+    with open("formatted_changelog_icons.md") as file:
+        return file.read()
+    
+@pytest.fixture
 def changelog_body() -> str:
     with open("changelog.md") as file:
         return file.read()
@@ -86,12 +91,24 @@ def csv_string_no_comma() -> Literal['bugfix']:
     return "bugfix"
 
 @pytest.fixture
-def csv_string_empty() -> Literal['']:
+def empty_string() -> str:
     return ""
 
 @pytest.fixture
 def changelog_label_list() -> list[str]:
-    return ["type: enhancement", "type: bug", "type: maintenance"]
+    return ["type: enhancement", "type: bugfix", "type: maintenance"]
+
+@pytest.fixture
+def label_with_emote() -> str:
+    return "type: bugfix(🐛)"
+
+@pytest.fixture
+def label_type_prefix() -> str:
+    return "type: bugfix"
+
+@pytest.fixture
+def changelog_label_list_icons() -> list[str]:
+    return ["feature(🎉)", "type: enhancement(💚)", "type: bugfix(🐛)", "type: maintenance"]
 
 @pytest.fixture
 def changelog_exclude_label_list() -> List[str]:
@@ -132,9 +149,9 @@ def test_csv_string_to_list_no_comma(csv_string_no_comma: Literal['bugfix']) -> 
 
     assert string_list == ["bugfix"]
 
-def test_csv_string_to_list_empty(csv_string_empty: Literal['']) -> None:
-    string_list: List[str] = conversion_logic.csv_string_to_list(csv_string_empty)
-    string_list: List[str] = conversion_logic.csv_string_to_list(csv_string_empty)
+def test_csv_string_to_list_empty(empty_string: Literal['']) -> None:
+    string_list: List[str] = conversion_logic.csv_string_to_list(empty_string)
+    string_list: List[str] = conversion_logic.csv_string_to_list(empty_string)
 
     assert string_list == []
 
@@ -222,7 +239,6 @@ def test_format_changelog_markdown(merged_pr_samples: List[dict[str, str]], chan
     filtered_pr_list: List[conversion_logic.Changelog] = conversion_logic.filter_changes_per_label(pr_data=merged_pr_samples, changelog_label_list=changelog_label_list)
     changelog_result: str = conversion_logic.format_changelog_markdown(changes=filtered_pr_list, changelog_label_list=changelog_label_list)
 
-    print(changelog_result)
     assert changelog_result == changelog_markdown
 
 def test_format_changelog_markdown_no_data(changelog_label_list: List[str]) -> None:
@@ -230,3 +246,39 @@ def test_format_changelog_markdown_no_data(changelog_label_list: List[str]) -> N
     changelog_result: str = conversion_logic.format_changelog_markdown(changes=filtered_pr_list, changelog_label_list=changelog_label_list)
 
     assert changelog_result == "# Changelog\n"
+
+def test_filter_emote(label_with_emote: str) -> None:
+    filter_result: str = conversion_logic.filter_emote(text=label_with_emote)
+
+    assert filter_result == "type: bugfix"
+
+def test_filter_emote_no_emote(label_type_prefix: str) -> None:
+    filter_result: str = conversion_logic.filter_emote(text=label_type_prefix)
+
+    assert filter_result == "type: bugfix"
+
+def test_filter_emote_empty(empty_string: str) -> None:
+    filter_result: str = conversion_logic.filter_emote(text=empty_string)
+
+    assert filter_result == ""
+
+def test_format_label_emote(label_with_emote: str) -> None:
+    formatted_label: str = conversion_logic.format_label(text=label_with_emote)
+
+    assert formatted_label == "🐛 **Bugfix**"
+
+def test_format_label_empty(empty_string: str) -> None:
+    formatted_label: str = conversion_logic.format_label(text=empty_string)
+
+    assert formatted_label == ""
+
+def test_format_label(label_type_prefix: str) -> None:
+    formatted_label: str = conversion_logic.format_label(text=label_type_prefix)
+
+    assert formatted_label == "**Bugfix**"
+
+def test_format_changelog_markdown_icons(merged_pr_samples: List[dict[str, str]], changelog_label_list_icons: List[str], changelog_markdown_icons: str) -> None:
+    filtered_pr_list: List[conversion_logic.Changelog] = conversion_logic.filter_changes_per_label(pr_data=merged_pr_samples, changelog_label_list=changelog_label_list_icons)
+    changelog_result: str = conversion_logic.format_changelog_markdown(changes=filtered_pr_list, changelog_label_list=changelog_label_list_icons)
+
+    assert changelog_result == changelog_markdown_icons

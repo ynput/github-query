@@ -1,5 +1,6 @@
 import logging
 import re
+import unicodedata
 
 from typing import NamedTuple, List
 
@@ -167,14 +168,16 @@ def format_changelog_markdown(changes: List[Changelog], changelog_label_list: Li
     change_label_list: set[str] = {label for change in changes for label in change.labels}
 
     for label in changelog_label_list:
-        if label not in change_label_list:
+        filtered_label: str = filter_emote(label)
+
+        if filtered_label not in change_label_list:
             continue
 
-        formatted_label: str = label.removeprefix("type: ").capitalize()
-        changelog += f"\n### **{formatted_label}**\n\n"
+        formatted_label: str = format_label(label)
+        changelog += f"\n### {formatted_label}\n\n"
 
         for change in changes:
-            if label in change.labels:
+            if filtered_label in change.labels:
                 changelog += f"<details>\n"
                 changelog += f"<summary>{change.title} - <a href=\"{change.url}\")>#{change.number}</a></summary>\n\n"
 
@@ -189,3 +192,24 @@ def format_changelog_markdown(changes: List[Changelog], changelog_label_list: Li
                 changelog += f"</details>\n"
 
     return changelog
+
+def filter_emote(text: str) -> str:
+    emojis: List[str] = [char for char in text if unicodedata.category(char) == 'So']
+
+    if emojis:
+        return text.split("(")[0]
+    
+    return text
+
+def format_label(text: str) -> str:
+    emojis: List[str] = [char for char in text if unicodedata.category(char) == 'So']
+
+    if not text:
+        return ""
+
+    if emojis:
+        label: str = text.split("(")[0]
+
+        return f"{emojis[0]} **{label.removeprefix('type: ').capitalize()}**"
+
+    return f"**{text.removeprefix('type: ').capitalize()}**"
