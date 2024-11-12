@@ -44,12 +44,12 @@ jobs:
     steps:
         - name: Run action
           id: test-action
-          uses: ynput/github-query@generate-changelog
+          uses: ynput/github-query@add-icons
           with:
             repo: "ynput/ayon-addon-action-testing"
             date: "2024-08-20T12:03:23Z"
             query_parameters: "body,labels,title,number,url,id"
-            changelog_labels: "feature,enhancement,bugfix,refactor,docs,test,pr"
+            changelog_labels: "feature(🎉),enhancement(💚),bugfix(🐛),refactor,docs,test,pr"
 
         - name: Show results
           run: |

@@ -35,7 +35,7 @@
     "labels": [
       {
         "id": "LA_kwDOMQ8b8s8AAAABqmH60w",
-        "name": "type: bug",
+        "name": "type: bugfix",
         "description": "Something isn't working",
         "color": "FFA696"
       },
@@ -56,7 +56,7 @@
     "labels": [
       {
         "id": "LA_kwDOMQ8b8s8AAAABqmH60w",
-        "name": "type: bug",
+        "name": "type: bugfix",
         "description": "Something isn't working",
         "color": "FFA696"
       }
@@ -71,7 +71,7 @@
     "labels": [
       {
         "id": "LA_kwDOMQ8b8s8AAAABqmH60w",
-        "name": "type: bug",
+        "name": "type: bugfix",
         "description": "Something isn't working",
         "color": "FFA696"
       },
@@ -98,7 +98,7 @@
     "labels": [
       {
         "id": "LA_kwDOMQ8b8s8AAAABqmH60w",
-        "name": "type: bug",
+        "name": "type: bugfix",
         "description": "Something isn't working",
         "color": "FFA696"
       }
