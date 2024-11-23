@@ -135,6 +135,8 @@ def get_changelog_description(pr_body: str, changelog_desc: str ="## Changelog D
     changelog_section = None
     description_lines: list[str] = []
 
+    # TODO add early return in case changelog_desc was not found
+
     for line in lines:
         if line.startswith(changelog_desc):
             changelog_section = True
@@ -146,9 +148,11 @@ def get_changelog_description(pr_body: str, changelog_desc: str ="## Changelog D
         if changelog_section:
             description_lines.append(line.strip())
 
-    for index in [0, -1]:
-        if not description_lines[index]:
-            description_lines.pop(index)
+
+    if description_lines:
+        for index in [0, -1]:
+            if not description_lines[index]:
+                description_lines.pop(index)
 
     return description_lines
 
