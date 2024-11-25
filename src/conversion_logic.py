@@ -26,21 +26,26 @@ def filter_unique_labels(pr_data: List[dict[str, str]]) -> List[str]:
         list: List of unique labels strings found or `None`.
     """
 
-    labels = set()
+    labels: set[str] = set()
 
     for item in pr_data:
         if not item.get("labels"):
-            logger.warning("No PR label data found.")
-            return []
+            logger.warning(f"No PR label data found in {item.get('url')}.")
+            continue
         for label in item["labels"]:
             if not label.get("name"):
-                logger.warning("No PR label names found.")
-                return []
+                logger.warning(f"No PR label names found in {item.get('url')}.")
+                continue
 
             labels.add(label["name"])
             logger.debug("PR labels found.")
 
-    return list(labels)
+    label_list: list[str] = list(labels) 
+    if not label_list:
+        logger.warning(f"No PR label data found")
+        return []
+
+    return label_list
 
 
 def csv_string_to_list(input: str) -> List[str]:

@@ -288,3 +288,5 @@ def test_format_changelog_markdown_icons(merged_pr_samples: List[dict[str, str]]
     changelog_result: str = conversion_logic.format_changelog_markdown(changes=filtered_pr_list, changelog_label_list=changelog_label_list_icons)
 
     assert changelog_result == changelog_markdown_icons
+
+# TODO add test for mix of labels with type and without type labels
