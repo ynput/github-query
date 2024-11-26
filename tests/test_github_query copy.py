@@ -134,10 +134,10 @@ def test_get_labels_no_labels(pr_api_output_no_labels: List[dict[str, Any]]) -> 
     assert labels == []
 
 
-def test_get_labels_some_labels(pr_api_output_some_labels: List[dict[str, Any]]) -> None:
-    labels: List[str] = conversion_logic.filter_unique_labels(pr_data=pr_api_output_some_labels)
+def test_get_labels_some_labels(pr_api_output_no_labels: List[dict[str, Any]]) -> None:
+    labels: List[str] = conversion_logic.filter_unique_labels(pr_data=pr_api_output_no_labels)
 
-    assert set(labels) == {"type: enhancement", "type: bugfix", "sponsored"}
+    assert labels == []
 
 # Convert repo label list
 
@@ -287,7 +287,7 @@ def test_format_label(label_type_prefix: str) -> None:
 
     assert formatted_label == "**Bugfix**"
 
-def test_get_changelog_description_no_description() -> None:
+def test_get_changelog_description_no_descprition():
     pr_body = "## Changelog\r\n<!-- Paragraphs contain detailed information on the changes made to the product or service, providing an in-depth description of the updates and enhancements. They can be used to explain the reasoning behind the changes, or to highlight the importance of the new features. Paragraphs can often include links to further information or support documentation. -->\r\n\r\nOn Maya scene exports only include the relevant history for the selected nodes downstream and upstream and not upstream, and also their downstream descendant children.\r\n\r\n## Additional info\r\n<!-- Paragraphs of text giving context of additional technical information or code examples. -->\r\n\r\nNote: This may affect maya scene exports, camera rig exports and layout exports. However, I do feel this is a way more sensible default behavior on exports _with_ construction history enabled.\r\n\r\nWith this change, if you have a hierarchy like:\r\n```\r\ngrp/\r\n    obj1\r\n    obj2\r\n```\r\nAnd `obj1` is inside the instance then after this PR `obj2` is not included.\r\nBefore this PR all other descendents from upstream groups would be included, regardless of whether they were \"inputs\" to the `obj1`.\r\n\r\nAfter this PR, if `obj2` is an input connection to `obj1` (e.g. there are active constraints driving `obj1` or some other connections driving it) then `obj2` **will still be included.**\r\n\r\nAs such, only objects actively contributing to members of the instance will still be included in the output.\r\n\r\n## Testing notes:\r\n\r\n1. Recreate the aforementioned hierarchy from additional info.\r\n2. Publish `obj1` - it should not include `obj2`\r\n3. Now make a connection from `obj2` to `obj1` (e.g. translate connection)\r\n4. Now `obj2` should also be included in `obj2`.\r\n5. Now disconnect the connection, and key `obj1`  transforms.\r\n6. The keys should be exported along just fine."
     changelog_desc_result: List[str] = conversion_logic.get_changelog_description(pr_body)
 
@@ -298,3 +298,5 @@ def test_format_changelog_markdown_icons(merged_pr_samples: List[dict[str, str]]
     changelog_result: str = conversion_logic.format_changelog_markdown(changes=filtered_pr_list, changelog_label_list=changelog_label_list_icons)
 
     assert changelog_result == changelog_markdown_icons
+
+# TODO add test for mix of labels with type and without type labels

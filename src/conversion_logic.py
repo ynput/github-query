@@ -23,7 +23,7 @@ def filter_unique_labels(pr_data: List[dict[str, str]]) -> List[str]:
         pr_data (dict): Github PR query result
 
     Returns:
-        list: List of unique labels strings found or `None`.
+        list: List of unique labels strings found or an empty list.
     """
 
     labels: set[str] = set()
@@ -40,12 +40,7 @@ def filter_unique_labels(pr_data: List[dict[str, str]]) -> List[str]:
             labels.add(label["name"])
             logger.debug("PR labels found.")
 
-    label_list: list[str] = list(labels) 
-    if not label_list:
-        logger.warning(f"No PR label data found")
-        return []
-
-    return label_list
+    return list(labels)
 
 
 def csv_string_to_list(input: str) -> List[str]:
