@@ -13,8 +13,12 @@ inputs:
   repo:
     description: Repository to query data from in the format of <owner>/<repo-name>
     required: true
+  base_branch:
+    description: Only filter for PRs merged into this branch
+    required: true
+    default: "develop"
   date:
-    description: Starting date to start query from.
+    description: Starting date to start query from
     required: true
   query_parameters:
     description: Parameters to query for in pr Information
@@ -58,7 +62,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        label_list=$(python github_query.py pr-labels "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        label_list=$(python github_query.py pr-labels "${{ inputs.repo }}" "${{ inputs.base_branch }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
        
         echo "label_list=$label_list" >> $GITHUB_OUTPUT
 
@@ -67,7 +71,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        increment=$(python github_query.py version-increment "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
+        increment=$(python github_query.py version-increment "${{ inputs.repo }}" "${{ inputs.base_branch }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}")
 
         echo "increment=$increment" >> $GITHUB_OUTPUT
 
@@ -81,7 +85,7 @@ runs:
       shell: bash
       run: |
         cd $GITHUB_ACTION_PATH
-        changelog=$(python github_query.py generate-release-changelog "${{ inputs.repo }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}" "${{ inputs.changelog_labels }}")
+        changelog=$(python github_query.py generate-release-changelog "${{ inputs.repo }}" "${{ inputs.base_branch }}" "${{ inputs.query_parameters }}" "${{ inputs.date }}" "${{ inputs.changelog_labels }}")
         delimiter="$(openssl rand -hex 8)"
         {
           echo "changelog<<${delimiter}"
