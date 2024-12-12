@@ -32,7 +32,7 @@
 ```
 
 * `.github/workflows`: Github Action workflow running pytest suite and the action itself
-* `docs`: THis documentation
+* `docs`: This documentation
 * `src`: The query and conversion logic used by this action
 * `tests`: Pytest-Suite for automated testing, including sample files
 * `README.md`: User documentation to use the action.

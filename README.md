@@ -47,7 +47,7 @@ For details see [action.yml](https://github.com/ynput/github-query/blob/main/act
 Unit-test are included in `tests/` and will run on every pr targeting main and very push to main.
 These tests can be run local by changing into the `tests/` directory and running `pytest`
 
-## Developer-Hints
+## Developer-Docs
 
 The python file `github_query.py` calls all the main logic and provides it's function to `action.yml` through click-parameters.
-This makes the python function calls convenient to use from terminal while keeping them easy to test.
+This makes the python function calls convenient to use from terminal while keeping them easy to test. For more detailed documentation check the [docs directory](https://github.com/ynput/github-query/tree/main/docs).
