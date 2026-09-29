@@ -3,7 +3,7 @@
 ### **Enhancement**
 
 <details>
-<summary>Improve applying render resolution and aspect ratio on render settings reset - <a href="https://github.com/ynput/ayon-maya/pull/75")>#75</a></summary>
+<summary>Improve applying render resolution and aspect ratio on render settings reset - <a href="https://github.com/ynput/ayon-maya/pull/75">#75</a></summary>
 
 
 Fix pixel aspect ratio / device aspect ratio getting messed up for Arnold renderer on render settings reset.
@@ -16,7 +16,7 @@ ___
 
 </details>
 <details>
-<summary>Validate unique names only within the instance not in full scene - <a href="https://github.com/ynput/ayon-maya/pull/70")>#70</a></summary>
+<summary>Validate unique names only within the instance not in full scene - <a href="https://github.com/ynput/ayon-maya/pull/70">#70</a></summary>
 
 
 Validate unique names only within the instance not in full scene
@@ -28,7 +28,7 @@ ___
 ### **Bugfix**
 
 <details>
-<summary>AY-6654 Look: Fix None values in collecting and applying attributes - <a href="https://github.com/ynput/ayon-maya/pull/89")>#89</a></summary>
+<summary>AY-6654 Look: Fix None values in collecting and applying attributes - <a href="https://github.com/ynput/ayon-maya/pull/89">#89</a></summary>
 
 
 This fixes a case where looks failed to apply due to `None` values being present in the collected attributes.
@@ -40,7 +40,7 @@ ___
 
 </details>
 <details>
-<summary>Fix settings for Maya USD Animation Extractor - <a href="https://github.com/ynput/ayon-maya/pull/77")>#77</a></summary>
+<summary>Fix settings for Maya USD Animation Extractor - <a href="https://github.com/ynput/ayon-maya/pull/77">#77</a></summary>
 
 
 Fix name in settings to match with name of plug-in to ensure settings are actually applied
@@ -49,7 +49,7 @@ ___
 
 </details>
 <details>
-<summary>Improve applying render resolution and aspect ratio on render settings reset - <a href="https://github.com/ynput/ayon-maya/pull/75")>#75</a></summary>
+<summary>Improve applying render resolution and aspect ratio on render settings reset - <a href="https://github.com/ynput/ayon-maya/pull/75">#75</a></summary>
 
 
 Fix pixel aspect ratio / device aspect ratio getting messed up for Arnold renderer on render settings reset.
@@ -62,7 +62,7 @@ ___
 
 </details>
 <details>
-<summary>Maya Scene exports do not default to including nodes that not children of members - <a href="https://github.com/ynput/ayon-maya/pull/71")>#71</a></summary>
+<summary>Maya Scene exports do not default to including nodes that not children of members - <a href="https://github.com/ynput/ayon-maya/pull/71">#71</a></summary>
 
 
 On Maya scene exports only include the relevant history for the selected nodes downstream and upstream and not upstream, and also their downstream descendant children.
@@ -74,7 +74,7 @@ ___
 ### **Maintenance**
 
 <details>
-<summary>Skip extraction of active view for automatic tests - <a href="https://github.com/ynput/ayon-maya/pull/126")>#126</a></summary>
+<summary>Skip extraction of active view for automatic tests - <a href="https://github.com/ynput/ayon-maya/pull/126">#126</a></summary>
 
 It seems that Maya UI is not completely visible or shutting down, `view.readColorBuffer` causes RuntimeError: (kFailure): Unexpected Internal Failure aas view is not visible.
 
