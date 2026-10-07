@@ -49,7 +49,7 @@ runs:
       id: raw-output
       shell: bash
       run: |
-        raw_output=$(gh pr list --state merged --search 'merged:>=${{ inputs.date }}' --json ${{ inputs.query_parameters }} --repo ${{ inputs.repo }})
+        raw_output=$(gh pr list --state merged --search 'merged:>=${{ inputs.date }}' --limit 1000 --json ${{ inputs.query_parameters }} --repo ${{ inputs.repo }})
         if [[ "$raw_output" == '[]' ]]; then
           echo "raw_output=''" >> $GITHUB_OUTPUT
           exit 0

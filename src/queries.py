@@ -21,6 +21,7 @@ def query_merged_prs(latest_release_date: str, query_tags: list[str], base_branc
             "--state", "merged", 
             "--base", base_branch,
             "--search", f'merged:>={latest_release_date}', 
+            "--limit", "1000",
             "--json", ','.join(query_tags), 
             "--repo", repo_name
         ],
